@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Script Page — AI Content Studio</title>
+  <title>Script Detail — AI Content Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/components.css?v=3">
   <link rel="stylesheet" href="css/dashboard.css?v=3">
   <link rel="stylesheet" href="css/prompts.css">
+  <link rel="stylesheet" href="css/script-detail.css">
   <script>
     (function () {
       var t = localStorage.getItem("thirukkural-theme") || "dark";
@@ -54,11 +55,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
           <div>
-            <h1 class="topbar-title">Script Page</h1>
+            <h1 class="topbar-title">Script Detail</h1>
             <div class="topbar-breadcrumb">
-              <span>Admin</span>
+              <a href="prompts.html" style="color: inherit; text-decoration: none;">Scripts</a>
               <span>/</span>
-              <span>Scripts</span>
+              <span id="breadcrumb-kural">—</span>
             </div>
           </div>
         </div>
@@ -74,88 +75,84 @@
         </div>
       </header>
 
-      <main class="admin-content">
-        <section class="prompt-header">
-          <div>
-            <h1>Script Page</h1>
-            <p>Video scripts with timing, detailed explanations, and AI generation prompts for images, characters, and videos</p>
-          </div>
-          <button type="button" class="ui-btn ui-btn-primary" id="create-prompt-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Create Script
-          </button>
-        </section>
+      <main class="admin-content" id="script-detail-root">
 
-        <section class="prompt-stats">
-          <div class="stat-card">
-            <div class="stat-label">Scripts Created</div>
-            <div class="stat-value" id="total-scripts">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Kurals Covered</div>
-            <div class="stat-value" id="kurals-covered">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Remaining</div>
-            <div class="stat-value" id="kurals-remaining">1330</div>
-          </div>
-        </section>
-
-        <section class="prompt-filters">
-          <div class="filter-group">
-            <label for="search-input">Search by kural or title</label>
-            <input type="text" id="search-input" class="filter-input" placeholder="e.g., Kural 1, Divine Rain, Praise...">
-          </div>
-          <div class="filter-group">
-            <label for="category-filter">Category</label>
-            <select id="category-filter" class="filter-select">
-              <option value="">All Categories</option>
-              <option value="Divine">Divine</option>
-              <option value="Virtue">Virtue</option>
-              <option value="Prosperity">Prosperity</option>
-              <option value="Family">Family</option>
-              <option value="Love">Love</option>
-              <option value="General">General</option>
-            </select>
-          </div>
-          <div class="filter-group">
-            <label for="story-filter">Story Reference</label>
-            <select id="story-filter" class="filter-select">
-              <option value="">All</option>
-              <option value="with-story">With Story</option>
-              <option value="no-story">No Story</option>
-            </select>
+        <!-- Script Header -->
+        <section class="script-detail-header ui-card">
+          <div class="ui-card-body">
+            <div class="sd-header-top">
+              <div class="sd-header-info">
+                <div class="sd-header-badges">
+                  <span class="kural-badge" id="sd-kural-id">TK-0000</span>
+                  <span class="ui-badge ui-badge-muted" id="sd-theme">Theme</span>
+                  <span class="ui-badge ui-badge-warning" id="sd-status">Draft</span>
+                </div>
+                <h1 class="sd-title" id="sd-title">Script Title</h1>
+                <div class="sd-meta-row">
+                  <span><strong id="sd-scene-count">0</strong> scenes</span>
+                  <span class="sd-meta-dot">•</span>
+                  <span><strong id="sd-duration">0:00</strong> total</span>
+                  <span class="sd-meta-dot">•</span>
+                  <span>Updated <strong id="sd-updated">—</strong></span>
+                </div>
+              </div>
+              <div class="sd-header-actions">
+                <button type="button" class="ui-btn" id="generate-script-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                  Regenerate Script
+                </button>
+                <button type="button" class="ui-btn ui-btn-primary" id="add-scene-btn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add Scene
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section class="prompt-content">
-          <div class="prompts-list" id="prompts-list"></div>
-          <div class="prompt-empty" id="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-            </svg>
-            <h3>No scripts found</h3>
-            <p>Create new scripts or adjust your filters</p>
+        <!-- Story Preview (readonly) -->
+        <section class="ui-card sd-story-preview">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Story Preview</h2>
+            <span class="ui-card-subtitle">Read-only — sourced from Story Library</span>
+          </div>
+          <div class="ui-card-body">
+            <p id="sd-story-text" class="sd-story-text"></p>
+            <div class="sd-kural-box">
+              <p class="sd-kural-tamil" id="sd-kural-tamil"></p>
+              <p class="sd-kural-en" id="sd-kural-en"></p>
+            </div>
           </div>
         </section>
+
+        <!-- Scene Timeline -->
+        <section class="ui-card sd-timeline-section">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Scene Timeline</h2>
+            <span class="ui-card-subtitle">Click a scene to edit</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="scene-timeline" id="scene-timeline"></div>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
 
-  <!-- Script Detail Modal -->
-  <div class="prompt-modal" id="prompt-modal">
-    <div class="modal-overlay" id="modal-overlay"></div>
-    <div class="modal-content">
-      <button type="button" class="modal-close" id="modal-close">
+  <!-- Scene Editor Modal -->
+  <div class="prompt-modal" id="scene-editor-modal">
+    <div class="modal-overlay" id="scene-modal-overlay"></div>
+    <div class="modal-content scene-editor-content">
+      <button type="button" class="modal-close" id="scene-modal-close">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-      <div id="modal-body" class="modal-body"></div>
+      <div id="scene-editor-body" class="modal-body"></div>
     </div>
   </div>
 
   <script src="js/dashboard.js?v=4"></script>
-  <script src="js/prompts-data.js?v=2"></script>
   <script src="js/scripts-data.js"></script>
-  <script src="js/prompts.js?v=3"></script>
+  <script src="js/script-detail.js"></script>
 </body>
 </html>
