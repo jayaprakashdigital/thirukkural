@@ -1,0 +1,388 @@
+/* Reusable UI components — shared across admin dashboard */
+
+.ui-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.ui-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.ui-card-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ui-card-subtitle {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.ui-card-body {
+  padding: 1.25rem;
+}
+
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.ui-badge-gold {
+  background: var(--gold-dim);
+  border: 1px solid var(--border-strong);
+  color: var(--gold-soft);
+}
+
+.ui-badge-success {
+  background: rgba(45, 212, 191, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  color: #2dd4bf;
+}
+
+.ui-badge-warning {
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid var(--border-strong);
+  color: var(--gold-soft);
+}
+
+.ui-badge-muted {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.ui-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.ui-btn-icon:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-strong);
+}
+
+.ui-btn-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Text buttons — used across library, prompts, and character pages.
+   Without these rules the inline SVG icons render at natural size. */
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.ui-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-strong);
+}
+
+.ui-btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.ui-btn-primary {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1c1917;
+}
+
+.ui-btn-primary:hover {
+  background: var(--gold-soft);
+  border-color: var(--gold-soft);
+  color: #1c1917;
+  transform: translateY(-1px);
+}
+
+.ui-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.ui-stat-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.ui-stat-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.ui-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-strong);
+  color: var(--gold);
+}
+
+.ui-stat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ui-stat-icon.teal {
+  background: rgba(45, 212, 191, 0.12);
+  border-color: rgba(45, 212, 191, 0.25);
+  color: #2dd4bf;
+}
+
+.ui-stat-icon.rose {
+  background: rgba(244, 63, 94, 0.12);
+  border-color: rgba(244, 63, 94, 0.25);
+  color: #fb7185;
+}
+
+.ui-stat-icon.blue {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.25);
+  color: #60a5fa;
+}
+
+.ui-stat-content { min-width: 0; }
+
+.ui-stat-value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.ui-stat-label {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.ui-stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.ui-stat-trend.up { color: #2dd4bf; }
+.ui-stat-trend.down { color: #fb7185; }
+.ui-stat-trend.neutral { color: var(--muted); }
+
+.ui-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ui-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.35rem;
+  padding-left: 0.25rem;
+}
+
+.ui-timeline-item:last-child { padding-bottom: 0; }
+
+.ui-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 19px;
+  top: 36px;
+  bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+
+.ui-timeline-item:last-child::before { display: none; }
+
+.ui-timeline-dot {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  z-index: 1;
+}
+
+.ui-timeline-dot svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ui-timeline-dot.story { color: #2dd4bf; border-color: rgba(45, 212, 191, 0.25); background: rgba(45, 212, 191, 0.08); }
+.ui-timeline-dot.character { color: var(--gold); border-color: var(--border-strong); background: var(--gold-dim); }
+.ui-timeline-dot.image { color: #60a5fa; border-color: rgba(96, 165, 250, 0.25); background: rgba(96, 165, 250, 0.08); }
+.ui-timeline-dot.video { color: #fb7185; border-color: rgba(244, 63, 94, 0.25); background: rgba(244, 63, 94, 0.08); }
+.ui-timeline-dot.publish { color: var(--gold); border-color: var(--border-strong); background: var(--gold-dim); }
+
+.ui-timeline-body {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.15rem;
+}
+
+.ui-timeline-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ui-timeline-desc {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ui-timeline-time {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.ui-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+}
+
+.ui-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 1.15rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.ui-action-btn:hover {
+  color: var(--text);
+  background: var(--gold-dim);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.ui-action-btn .ui-action-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-strong);
+  color: var(--gold);
+}
+
+.ui-action-btn .ui-action-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ui-toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid, #1c1917);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transform: translateY(120%);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.ui-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ui-toast-icon { color: var(--gold); }

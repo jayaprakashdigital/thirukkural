@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — AI Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <script>
+    (function () {
+      var t = localStorage.getItem("thirukkural-theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+  <style>
+/* ============================================================
+   BASE / RESET / TOKENS  (styles.css)
+   ============================================================ */
+:root {
+  --bg: #0c0a09;
+  --surface: rgba(28, 25, 23, 0.72);
+  --surface-solid: #1c1917;
+  --surface-hover: rgba(41, 37, 36, 0.9);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(251, 191, 36, 0.22);
+  --text: #fafaf9;
+  --text-secondary: #d6d3d1;
+  --muted: #78716c;
+  --gold: #fbbf24;
+  --gold-soft: #fcd34d;
+  --gold-dim: rgba(251, 191, 36, 0.12);
+  --amber-glow: rgba(251, 191, 36, 0.35);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  --font-ui: "DM Sans", system-ui, sans-serif;
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-tamil: "Noto Sans Tamil", "Latha", "Nirmala UI", sans-serif;
+  --nav-height: 72px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-ui);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+.bg-scene {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% -10%, rgba(251,191,36,0.14), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 90% 0%, rgba(244,63,94,0.08), transparent 50%),
+    radial-gradient(ellipse 70% 60% at 50% 100%, rgba(45,212,191,0.06), transparent 55%),
+    linear-gradient(180deg, #0c0a09 0%, #141110 50%, #0c0a09 100%);
+}
+.bg-scene::before, .bg-scene::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+.bg-scene::before {
+  width: 420px; height: 420px;
+  top: -120px; right: 10%;
+  background: rgba(251,191,36,0.15);
+}
+.bg-scene::after {
+  width: 360px; height: 360px;
+  bottom: 10%; left: -80px;
+  background: rgba(244,63,94,0.1);
+  animation-delay: -6s;
+}
+@keyframes drift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(30px,20px) scale(1.08); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-strong);
+  color: var(--gold-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+.eyebrow-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px var(--amber-glow);
+}
+/* ============================================================
+   COMPONENTS  (components.css)
+   ============================================================ */
+.ui-card {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.ui-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.ui-card-title { margin: 0; font-size: 1rem; font-weight: 600; color: var(--text); }
+.ui-card-subtitle { margin: 0.15rem 0 0; font-size: 0.82rem; color: var(--muted); }
+.ui-card-body { padding: 1.25rem; }
+.ui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.ui-badge-gold { background: var(--gold-dim); border: 1px solid var(--border-strong); color: var(--gold-soft); }
+.ui-badge-success { background: rgba(45,212,191,0.12); border: 1px solid rgba(45,212,191,0.25); color: #2dd4bf; }
+.ui-badge-warning { background: rgba(251,191,36,0.12); border: 1px solid var(--border-strong); color: var(--gold-soft); }
+.ui-badge-muted { background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--muted); }
+.ui-btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.ui-btn-icon:hover { color: var(--text); background: rgba(255,255,255,0.08); border-color: var(--border-strong); }
+.ui-btn-icon svg { width: 18px; height: 18px; }
+.ui-stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 1rem; }
+.ui-stat-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.15rem 1.2rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, transform 0.2s;
+}
+.ui-stat-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+.ui-stat-icon {
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; width: 42px; height: 42px;
+  border-radius: 12px;
+  background: var(--gold-dim);
+  border: 1px solid var(--border-strong);
+  color: var(--gold);
+}
+.ui-stat-icon svg { width: 20px; height: 20px; }
+.ui-stat-icon.teal { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.25); color: #2dd4bf; }
+.ui-stat-icon.rose { background: rgba(244,63,94,0.12); border-color: rgba(244,63,94,0.25); color: #fb7185; }
+.ui-stat-icon.blue { background: rgba(96,165,250,0.12); border-color: rgba(96,165,250,0.25); color: #60a5fa; }
+.ui-stat-content { min-width: 0; }
+.ui-stat-value { display: block; font-family: var(--font-display); font-size: 1.75rem; font-weight: 700; color: var(--text); line-height: 1.1; }
+.ui-stat-label { display: block; margin-top: 0.2rem; font-size: 0.8rem; color: var(--muted); }
+.ui-stat-trend { display: inline-flex; align-items: center; gap: 0.25rem; margin-top: 0.35rem; font-size: 0.75rem; font-weight: 600; }
+.ui-stat-trend.up { color: #2dd4bf; }
+.ui-stat-trend.down { color: #fb7185; }
+.ui-stat-trend.neutral { color: var(--muted); }
+.ui-timeline { list-style: none; margin: 0; padding: 0; }
+.ui-timeline-item {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 1.35rem;
+  padding-left: 0.25rem;
+}
+.ui-timeline-item:last-child { padding-bottom: 0; }
+.ui-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: 19px; top: 36px; bottom: 0;
+  width: 2px;
+  background: var(--border);
+}
+.ui-timeline-item:last-child::before { display: none; }
+.ui-timeline-dot {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--gold);
+  z-index: 1;
+}
+.ui-timeline-dot svg { width: 18px; height: 18px; }
+.ui-timeline-dot.story   { color: #2dd4bf; border-color: rgba(45,212,191,0.25); background: rgba(45,212,191,0.08); }
+.ui-timeline-dot.character { color: var(--gold); border-color: var(--border-strong); background: var(--gold-dim); }
+.ui-timeline-dot.image   { color: #60a5fa; border-color: rgba(96,165,250,0.25); background: rgba(96,165,250,0.08); }
+.ui-timeline-dot.video   { color: #fb7185; border-color: rgba(244,63,94,0.25); background: rgba(244,63,94,0.08); }
+.ui-timeline-dot.publish { color: var(--gold); border-color: var(--border-strong); background: var(--gold-dim); }
+.ui-timeline-body { flex: 1; min-width: 0; padding-top: 0.15rem; }
+.ui-timeline-title { margin: 0 0 0.25rem; font-size: 0.92rem; font-weight: 600; color: var(--text); }
+.ui-timeline-desc  { margin: 0 0 0.35rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+.ui-timeline-time  { font-size: 0.75rem; color: var(--muted); }
+.ui-action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 0.75rem; }
+.ui-action-btn {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 0.65rem; padding: 1.15rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font: inherit; font-size: 0.82rem; font-weight: 600;
+  text-align: center; cursor: pointer;
+  transition: color 0.2s, background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.ui-action-btn:hover { color: var(--text); background: var(--gold-dim); border-color: var(--border-strong); transform: translateY(-2px); }
+.ui-action-btn .ui-action-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 12px;
+  background: var(--gold-dim); border: 1px solid var(--border-strong); color: var(--gold);
+}
+.ui-action-btn .ui-action-icon svg { width: 20px; height: 20px; }
+.ui-toast {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1000;
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0.85rem 1.15rem;
+  border-radius: var(--radius-sm);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow);
+  color: var(--text); font-size: 0.9rem; font-weight: 500;
+  transform: translateY(120%); opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+.ui-toast.show { transform: translateY(0); opacity: 1; }
+.ui-toast-icon { color: var(--gold); }
+/* ============================================================
+   DASHBOARD LAYOUT  (dashboard.css)
+   ============================================================ */
+:root {
+  --sidebar-width: 260px;
+  --topbar-height: 64px;
+}
+[data-theme="light"] {
+  --bg: #f5f5f4;
+  --surface: rgba(255,255,255,0.85);
+  --surface-solid: #ffffff;
+  --surface-hover: rgba(245,245,244,0.95);
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(217,119,6,0.3);
+  --text: #1c1917;
+  --text-secondary: #57534e;
+  --muted: #78716c;
+  --gold: #d97706;
+  --gold-soft: #b45309;
+  --gold-dim: rgba(217,119,6,0.1);
+  --amber-glow: rgba(217,119,6,0.2);
+  --shadow: 0 16px 48px rgba(0,0,0,0.08);
+}
+[data-theme="light"] .bg-scene {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% -10%, rgba(251,191,36,0.12), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 90% 0%, rgba(244,63,94,0.05), transparent 50%),
+    linear-gradient(180deg, #fafaf9 0%, #f5f5f4 50%, #fafaf9 100%);
+}
+[data-theme="light"] .bg-scene::before,
+[data-theme="light"] .bg-scene::after { opacity: 0.35; }
+[data-theme="light"] .ui-btn-icon,
+[data-theme="light"] .ui-action-btn { background: rgba(0,0,0,0.03); }
+[data-theme="light"] .ui-action-btn:hover { background: var(--gold-dim); }
+body.dashboard-body { overflow-x: hidden; }
+.admin-layout { display: flex; min-height: 100vh; }
+.admin-sidebar {
+  position: fixed; top: 0; left: 0; z-index: 200;
+  width: var(--sidebar-width); height: 100vh;
+  display: flex; flex-direction: column;
+  background: rgba(12,10,9,0.92);
+  backdrop-filter: blur(24px);
+  border-right: 1px solid var(--border);
+  transition: transform 0.3s ease;
+}
+[data-theme="light"] .admin-sidebar { background: rgba(255,255,255,0.95); }
+.sidebar-header {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 1.25rem 1.15rem;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-brand {
+  display: flex; align-items: center; gap: 0.65rem;
+  text-decoration: none; color: var(--text); flex: 1; min-width: 0;
+}
+.sidebar-brand-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border-radius: 11px;
+  background: linear-gradient(135deg, var(--gold) 0%, #d97706 100%);
+  color: #1c1917; font-family: var(--font-tamil);
+  font-size: 1.15rem; font-weight: 700; flex-shrink: 0;
+}
+.sidebar-brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+.sidebar-brand-text strong { font-size: 0.95rem; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sidebar-brand-text span  { font-size: 0.7rem; color: var(--muted); font-weight: 500; }
+.sidebar-close { display: none; }
+.sidebar-nav {
+  flex: 1; overflow-y: auto; padding: 1rem 0.75rem;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.sidebar-section-label {
+  padding: 0.5rem 0.75rem 0.35rem;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.sidebar-menu { list-style: none; margin: 0 0 0.75rem; padding: 0; }
+.sidebar-link {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.7rem 0.85rem; margin-bottom: 0.15rem;
+  border-radius: 10px; text-decoration: none;
+  color: var(--text-secondary); font-size: 0.88rem; font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+}
+.sidebar-link svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.75; }
+.sidebar-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.sidebar-link.active { color: var(--gold-soft); background: var(--gold-dim); border: 1px solid var(--border-strong); }
+.sidebar-link.active svg { opacity: 1; color: var(--gold); }
+.sidebar-footer { padding: 1rem 0.75rem; border-top: 1px solid var(--border); }
+.sidebar-back-link {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 0.85rem; border-radius: 10px;
+  text-decoration: none; color: var(--muted); font-size: 0.82rem; font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+}
+.sidebar-back-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.sidebar-back-link svg { width: 16px; height: 16px; }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0; z-index: 190;
+  background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.3s;
+}
+.sidebar-overlay.visible { opacity: 1; }
+.admin-main { flex: 1; margin-left: var(--sidebar-width); min-width: 0; display: flex; flex-direction: column; }
+.admin-topbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; height: var(--topbar-height);
+  padding: 0 1.5rem;
+  background: rgba(12,10,9,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+[data-theme="light"] .admin-topbar { background: rgba(255,255,255,0.85); }
+.topbar-left { display: flex; align-items: center; gap: 0.85rem; min-width: 0; }
+.topbar-menu-btn { display: none; }
+.topbar-title { margin: 0; font-size: 1.15rem; font-weight: 600; color: var(--text); }
+.topbar-breadcrumb { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--muted); }
+.topbar-breadcrumb span:last-child { color: var(--gold-soft); font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+.topbar-user {
+  display: flex; align-items: center; gap: 0.65rem;
+  padding: 0.35rem 0.65rem 0.35rem 0.35rem;
+  border-radius: 999px; border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+}
+.topbar-avatar {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gold-dim); border: 1px solid var(--border-strong);
+  color: var(--gold); font-size: 0.75rem; font-weight: 700;
+}
+.topbar-user-info { display: flex; flex-direction: column; line-height: 1.2; }
+.topbar-user-name { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+.topbar-user-role { font-size: 0.68rem; color: var(--muted); }
+.admin-content { flex: 1; padding: 1.5rem; animation: fadeUp 0.5s ease both; }
+.dashboard-welcome { margin-bottom: 1.5rem; }
+.dashboard-welcome h1 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 1.85rem);
+  font-weight: 600; color: var(--text);
+}
+.dashboard-welcome p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+.dashboard-stats { margin-bottom: 1.5rem; }
+.dashboard-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; }
+.dashboard-grid .ui-card { animation: fadeUp 0.5s ease both; }
+.dashboard-grid .ui-card:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-grid .ui-card:nth-child(2) { animation-delay: 0.1s; }
+.site-footer {
+  margin-top: 2rem; padding: 1.25rem 0.25rem;
+  display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem;
+  justify-content: space-between; align-items: center;
+  font-size: 0.82rem; color: var(--muted);
+  border-top: 1px solid var(--border);
+}
+.site-footer a { color: var(--gold-soft); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+.site-footer a:hover { border-bottom-color: var(--gold-soft); }
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .admin-sidebar { transform: translateX(-100%); }
+  .admin-sidebar.open { transform: translateX(0); }
+  .sidebar-close { display: flex; }
+  .sidebar-overlay { display: block; pointer-events: none; }
+  .sidebar-overlay.visible { pointer-events: auto; }
+  .admin-main { margin-left: 0; }
+  .topbar-menu-btn { display: flex; }
+  .topbar-user-info { display: none; }
+  .admin-content { padding: 1rem; }
+  .ui-stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+  .ui-stat-grid { grid-template-columns: 1fr; }
+  .ui-action-grid { grid-template-columns: repeat(2, 1fr); }
+}
+  </style>
+</head>
+<body class="dashboard-body">
+  <div class="bg-scene" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#" class="sidebar-brand">
+          <span class="sidebar-brand-icon">AI</span>
+          <span class="sidebar-brand-text">
+            <strong>Content Studio</strong>
+            <span>Thirukkural Project</span>
+          </span>
+        </a>
+        <button type="button" class="ui-btn-icon sidebar-close" id="sidebar-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Admin navigation"></nav>
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Back to Public Site
+        </a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="ui-btn-icon topbar-menu-btn" id="sidebar-open" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="topbar-title">Dashboard</h1>
+            <div class="topbar-breadcrumb">
+              <span>Admin</span>
+              <span>/</span>
+              <span>Overview</span>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="ui-btn-icon" id="theme-toggle" aria-label="Switch theme"></button>
+          <div class="topbar-user">
+            <span class="topbar-avatar">AD</span>
+            <span class="topbar-user-info">
+              <span class="topbar-user-name">Admin</span>
+              <span class="topbar-user-role">Content Manager</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <section class="dashboard-welcome">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            AI Content Studio
+          </div>
+          <h1>Welcome back</h1>
+          <p>Manage your Thirukkural content pipeline — stories, characters, media, and publishing.</p>
+        </section>
+
+        <section class="dashboard-stats" aria-label="Statistics">
+          <div class="ui-stat-grid" id="stats-grid"></div>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="ui-card">
+            <div class="ui-card-header">
+              <div>
+                <h2 class="ui-card-title">Recent Activity</h2>
+                <p class="ui-card-subtitle">Latest updates across your project</p>
+              </div>
+              <span class="ui-badge ui-badge-gold">Live</span>
+            </div>
+            <div class="ui-card-body">
+              <ul class="ui-timeline" id="activity-timeline"></ul>
+            </div>
+          </article>
+
+          <article class="ui-card">
+            <div class="ui-card-header">
+              <div>
+                <h2 class="ui-card-title">Quick Actions</h2>
+                <p class="ui-card-subtitle">Start a new content task</p>
+              </div>
+            </div>
+            <div class="ui-card-body">
+              <div class="ui-action-grid" id="quick-actions"></div>
+            </div>
+          </article>
+        </section>
+
+        <footer class="site-footer">
+          <span>Thirukkural AI Content Studio</span>
+          <span>Data from <a href="https://github.com/tk120404/thirukkural" target="_blank" rel="noopener">tk120404/thirukkural</a></span>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+const ICONS = {
+  dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+  kurals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+  story: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+  character: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+  prompt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+  image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+  video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
+  workflow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+  publish: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
+  settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>',
+  task: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+};
+
+const SIDEBAR_MENU = [
+  { section: "Main" },
+  { id: "dashboard", label: "Dashboard", href: "#", icon: "dashboard", active: true },
+  { id: "kurals", label: "Kurals", href: "kurals.html", icon: "kurals" },
+  { section: "Content" },
+  { id: "stories",    label: "Story Library",     href: "stories.html", icon: "story" },
+  { id: "characters", label: "Character Library", href: "#", icon: "character", placeholder: true },
+  { id: "prompts",    label: "Prompt Library",    href: "#", icon: "prompt",    placeholder: true },
+  { section: "Media" },
+  { id: "images", label: "Image Library", href: "#", icon: "image", placeholder: true },
+  { id: "videos", label: "Video Library", href: "#", icon: "video", placeholder: true },
+  { section: "Pipeline" },
+  { id: "workflow",   label: "Workflow",   href: "#", icon: "workflow", placeholder: true },
+  { id: "publishing", label: "Publishing", href: "#", icon: "publish",  placeholder: true },
+  { section: "System" },
+  { id: "settings", label: "Settings", href: "#", icon: "settings", placeholder: true },
+];
+
+const STATS = [
+  { label: "Total Kurals",      value: "1,330", icon: "kurals",  color: "",     trend: "neutral", trendText: "Full collection loaded" },
+  { label: "Completed Stories", value: "24",    icon: "story",   color: "teal", trend: "up",      trendText: "+3 this week" },
+  { label: "Generated Images",  value: "156",   icon: "image",   color: "blue", trend: "up",      trendText: "+12 today" },
+  { label: "Generated Videos",  value: "42",    icon: "video",   color: "rose", trend: "up",      trendText: "+2 today" },
+  { label: "Published Videos",  value: "18",    icon: "publish", color: "teal", trend: "up",      trendText: "+1 this week" },
+  { label: "Pending Tasks",     value: "7",     icon: "task",    color: "rose", trend: "down",    trendText: "2 overdue" },
+];
+
+const ACTIVITY = [
+  { type: "story",     title: "Story draft created", desc: '"The Blessing of Rain" — Kural #11–20 storyboard saved.',               time: "2 hours ago" },
+  { type: "character", title: "Character updated",   desc: "Thiruvalluvar profile — voice tone and visual style revised.",           time: "5 hours ago" },
+  { type: "image",     title: "Image generated",     desc: "Scene illustration for Kural #12 — batch render completed.",            time: "Yesterday, 4:32 PM" },
+  { type: "video",     title: "Video rendered",      desc: '"Virtue of Ascetics" — 60s preview exported to Video Library.',         time: "Yesterday, 11:15 AM" },
+  { type: "publish",   title: "Video published",     desc: '"Praise of God" (Kural 1–5) uploaded to YouTube draft.',                time: "2 days ago" },
+  { type: "story",     title: "Prompt saved",        desc: "Cinematic Tamil narration prompt added to Prompt Library.",             time: "3 days ago" },
+];
+
+const QUICK_ACTIONS = [
+  { id: "create-story",     label: "Create Story",     icon: "story" },
+  { id: "create-character", label: "Create Character", icon: "character" },
+  { id: "generate-image",   label: "Generate Image",   icon: "image" },
+  { id: "generate-video",   label: "Generate Video",   icon: "video" },
+  { id: "publish-video",    label: "Publish Video",    icon: "publish" },
+];
+
+const THEME_KEY = "thirukkural-theme";
+
+function renderSidebar() {
+  const nav = document.getElementById("sidebar-nav");
+  if (!nav) return;
+  let html = "", inList = false;
+  for (const item of SIDEBAR_MENU) {
+    if (item.section) {
+      if (inList) html += "</ul>";
+      html += `<div class="sidebar-section-label">${item.section}</div><ul class="sidebar-menu">`;
+      inList = true;
+      continue;
+    }
+    const active = item.active ? " active" : "";
+    const ph = item.placeholder ? ' data-placeholder="true"' : "";
+    html += `<li><a href="${item.href}" class="sidebar-link${active}"${ph}>${ICONS[item.icon]} ${item.label}</a></li>`;
+  }
+  if (inList) html += "</ul>";
+  nav.innerHTML = html;
+  nav.querySelectorAll('[data-placeholder="true"]').forEach((link) => {
+    link.addEventListener("click", (e) => { e.preventDefault(); showToast(`${link.textContent.trim()} — coming soon`); });
+  });
+}
+
+function renderStats() {
+  const grid = document.getElementById("stats-grid");
+  if (!grid) return;
+  grid.innerHTML = STATS.map((s) => `
+    <article class="ui-stat-card">
+      <div class="ui-stat-icon ${s.color}">${ICONS[s.icon]}</div>
+      <div class="ui-stat-content">
+        <span class="ui-stat-value">${s.value}</span>
+        <span class="ui-stat-label">${s.label}</span>
+        <span class="ui-stat-trend ${s.trend}">${s.trendText}</span>
+      </div>
+    </article>`).join("");
+}
+
+function activityIcon(type) {
+  const map = { story: "story", character: "character", image: "image", video: "video", publish: "publish" };
+  return `<div class="ui-timeline-dot ${type}">${ICONS[map[type] || "story"]}</div>`;
+}
+
+function renderActivity() {
+  const list = document.getElementById("activity-timeline");
+  if (!list) return;
+  list.innerHTML = ACTIVITY.map((a) => `
+    <li class="ui-timeline-item">
+      ${activityIcon(a.type)}
+      <div class="ui-timeline-body">
+        <p class="ui-timeline-title">${a.title}</p>
+        <p class="ui-timeline-desc">${a.desc}</p>
+        <time class="ui-timeline-time">${a.time}</time>
+      </div>
+    </li>`).join("");
+}
+
+function renderQuickActions() {
+  const grid = document.getElementById("quick-actions");
+  if (!grid) return;
+  grid.innerHTML = QUICK_ACTIONS.map((a) => `
+    <button type="button" class="ui-action-btn" data-action="${a.id}">
+      <span class="ui-action-icon">${ICONS[a.icon]}</span>
+      ${a.label}
+    </button>`).join("");
+  grid.querySelectorAll("[data-action]").forEach((btn) => {
+    btn.addEventListener("click", () => { showToast(`${btn.textContent.trim()} — AI generation coming soon`); });
+  });
+}
+
+function showToast(message) {
+  let toast = document.querySelector(".ui-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.className = "ui-toast";
+    toast.innerHTML = `<span class="ui-toast-icon">${ICONS.story}</span><span class="ui-toast-text"></span>`;
+    document.body.appendChild(toast);
+  }
+  toast.querySelector(".ui-toast-text").textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => toast.classList.remove("show"), 3200);
+}
+
+function getTheme() { return localStorage.getItem(THEME_KEY) || "dark"; }
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem(THEME_KEY, theme);
+  const btn = document.getElementById("theme-toggle");
+  if (btn) {
+    btn.innerHTML = theme === "dark" ? ICONS.sun : ICONS.moon;
+    btn.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+  }
+}
+
+function initTheme() {
+  applyTheme(getTheme());
+  document.getElementById("theme-toggle")?.addEventListener("click", () => {
+    applyTheme(getTheme() === "dark" ? "light" : "dark");
+  });
+}
+
+function initSidebar() {
+  const sidebar = document.getElementById("sidebar");
+  const overlay = document.getElementById("sidebar-overlay");
+  const openBtn = document.getElementById("sidebar-open");
+  const closeBtn = document.getElementById("sidebar-close");
+  function open()  { sidebar?.classList.add("open");    overlay?.classList.add("visible");    document.body.style.overflow = "hidden"; }
+  function close() { sidebar?.classList.remove("open"); overlay?.classList.remove("visible"); document.body.style.overflow = ""; }
+  openBtn?.addEventListener("click", open);
+  closeBtn?.addEventListener("click", close);
+  overlay?.addEventListener("click", close);
+  window.addEventListener("resize", () => { if (window.innerWidth > 768) close(); });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderSidebar();
+  renderStats();
+  renderActivity();
+  renderQuickActions();
+  initTheme();
+  initSidebar();
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Script Page — AI Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <link rel="stylesheet" href="css/dashboard.css?v=3">
+  <link rel="stylesheet" href="css/prompts.css">
+  <script>
+    (function () {
+      var t = localStorage.getItem("thirukkural-theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body class="dashboard-body">
+  <div class="bg-scene" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="sidebar-brand">
+          <span class="sidebar-brand-icon">AI</span>
+          <span class="sidebar-brand-text">
+            <strong>Content Studio</strong>
+            <span>Thirukkural Project</span>
+          </span>
+        </a>
+        <button type="button" class="ui-btn-icon sidebar-close" id="sidebar-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Admin navigation"></nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Back to Public Site
+        </a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="ui-btn-icon topbar-menu-btn" id="sidebar-open" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="topbar-title">Script Page</h1>
+            <div class="topbar-breadcrumb">
+              <span>Admin</span>
+              <span>/</span>
+              <span>Scripts</span>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="ui-btn-icon" id="theme-toggle" aria-label="Switch theme"></button>
+          <div class="topbar-user">
+            <span class="topbar-avatar">AD</span>
+            <span class="topbar-user-info">
+              <span class="topbar-user-name">Admin</span>
+              <span class="topbar-user-role">Content Manager</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <section class="prompt-header">
+          <div>
+            <h1>Script Page</h1>
+            <p>Video scripts with timing, detailed explanations, and AI generation prompts for images, characters, and videos</p>
+          </div>
+          <button type="button" class="ui-btn ui-btn-primary" id="create-prompt-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Create Script
+          </button>
+        </section>
+
+        <section class="prompt-stats">
+          <div class="stat-card">
+            <div class="stat-label">Scripts Created</div>
+            <div class="stat-value" id="total-scripts">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Kurals Covered</div>
+            <div class="stat-value" id="kurals-covered">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Remaining</div>
+            <div class="stat-value" id="kurals-remaining">1330</div>
+          </div>
+        </section>
+
+        <section class="prompt-filters">
+          <div class="filter-group">
+            <label for="search-input">Search by kural or title</label>
+            <input type="text" id="search-input" class="filter-input" placeholder="e.g., Kural 1, Divine Rain, Praise...">
+          </div>
+          <div class="filter-group">
+            <label for="category-filter">Category</label>
+            <select id="category-filter" class="filter-select">
+              <option value="">All Categories</option>
+              <option value="Divine">Divine</option>
+              <option value="Virtue">Virtue</option>
+              <option value="Prosperity">Prosperity</option>
+              <option value="Family">Family</option>
+              <option value="Love">Love</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="story-filter">Story Reference</label>
+            <select id="story-filter" class="filter-select">
+              <option value="">All</option>
+              <option value="with-story">With Story</option>
+              <option value="no-story">No Story</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="prompt-content">
+          <div class="prompts-list" id="prompts-list"></div>
+          <div class="prompt-empty" id="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            <h3>No scripts found</h3>
+            <p>Create new scripts or adjust your filters</p>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Script Detail Modal -->
+  <div class="prompt-modal" id="prompt-modal">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="modal-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="modal-body" class="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="js/dashboard.js?v=4"></script>
+  <script src="js/prompts-data.js?v=2"></script>
+  <script src="js/prompts.js?v=2"></script>
+</body>
+</html>

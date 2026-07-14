@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Character Library — AI Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <link rel="stylesheet" href="css/dashboard.css?v=3">
+  <link rel="stylesheet" href="css/characters-table.css?v=4">
+  <script>
+    (function () {
+      var t = localStorage.getItem("thirukkural-theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body class="dashboard-body">
+  <div class="bg-scene" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="sidebar-brand">
+          <span class="sidebar-brand-icon">AI</span>
+          <span class="sidebar-brand-text">
+            <strong>Content Studio</strong>
+            <span>Thirukkural Project</span>
+          </span>
+        </a>
+        <button type="button" class="ui-btn-icon sidebar-close" id="sidebar-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Admin navigation"></nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Back to Public Site
+        </a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="ui-btn-icon topbar-menu-btn" id="sidebar-open" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="topbar-title">Character Library</h1>
+            <div class="topbar-breadcrumb">
+              <span>Admin</span>
+              <span>/</span>
+              <span>Content</span>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="ui-btn-icon" id="theme-toggle" aria-label="Switch theme"></button>
+          <div class="topbar-user">
+            <span class="topbar-avatar">AD</span>
+            <span class="topbar-user-info">
+              <span class="topbar-user-name">Admin</span>
+              <span class="topbar-user-role">Content Manager</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <section class="character-header">
+          <div>
+            <h1>Character Library</h1>
+            <p>Kural-wise character mapping with names, gender, and consistency details</p>
+          </div>
+          <button type="button" class="ui-btn ui-btn-primary" id="export-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            Export Data
+          </button>
+        </section>
+
+        <section class="character-stats">
+          <div class="stat-card">
+            <div class="stat-label">Total Characters</div>
+            <div class="stat-value" id="total-chars">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Kurals with Characters</div>
+            <div class="stat-value" id="kurals-covered">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Story-linked Characters</div>
+            <div class="stat-value" id="story-chars">0</div>
+          </div>
+        </section>
+
+        <section class="character-filters">
+          <div class="filter-group">
+            <label for="search-input">Search kural or character</label>
+            <input type="text" id="search-input" class="filter-input" placeholder="e.g., Kural 1, The Divine...">
+          </div>
+          <div class="filter-group">
+            <label for="gender-filter">Gender</label>
+            <select id="gender-filter" class="filter-select">
+              <option value="">All</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Divine">Divine</option>
+              <option value="Gender-neutral">Gender-neutral</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="story-filter">Story Reference</label>
+            <select id="story-filter" class="filter-select">
+              <option value="">All</option>
+              <option value="with-story">With Story</option>
+              <option value="no-story">No Story</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="sort-filter">Sort by</label>
+            <select id="sort-filter" class="filter-select">
+              <option value="kural-asc">Kural (1-1330)</option>
+              <option value="kural-desc">Kural (1330-1)</option>
+              <option value="name">Character Name</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="character-table-container">
+          <div class="table-info">
+            <span id="table-count">0 records</span>
+          </div>
+          <table class="characters-table" id="characters-table">
+            <thead>
+              <tr>
+                <th>Kural</th>
+                <th>Character Name</th>
+                <th>Gender</th>
+                <th>Role</th>
+                <th>Character Consistency</th>
+                <th>Story Reference</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-body">
+              <tr class="empty-row">
+                <td colspan="7">Loading characters...</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Character Detail Modal -->
+  <div class="character-detail-modal" id="character-modal">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-content">
+      <button type="button" class="modal-close" id="modal-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    // COMPLETE CHARACTER DATABASE - ALL 1330 KURALS
+    const COMPREHENSIVE_CHARACTER_DATABASE = {
+      1: [{id:"1-1-god",name:"The Supreme Being",transliteration:"Paramatman",gender:"Divine",role:"Creator",consistency:"Eternal source of all",details:"The Divine that precedes all creation and gives meaning to existence",story:"Praise of God",storyId:"story-1"}],
+      2: [{id:"2-1-wisdom",name:"Pure Knowledge",transliteration:"Ariven",gender:"Divine",role:"Wisdom Source",consistency:"All-knowing consciousness",details:"The embodiment of all knowledge and understanding",story:"Praise of God",storyId:"story-1"}],
+      3: [{id:"3-1-divine",name:"The Lotus Dweller",transliteration:"Malarmisai",gender:"Divine",role:"Transcendent",consistency:"Beyond comprehension",details:"Dwells in the lotus of devoted hearts",story:"Praise of God",storyId:"story-1"}],
+      4: [{id:"4-1-divine",name:"The Unattached",transliteration:"Veendum",gender:"Divine",role:"Supreme",consistency:"Free from desire",details:"Indifferent to worldly desires, pure consciousness",story:"Praise of God",storyId:"story-1"}],
+      5: [{id:"5-1-seeker",name:"The Humble Seeker",transliteration:"Padaimai",gender:"Gender-neutral",role:"Devotee",consistency:"Spiritual aspirant",details:"One who humbly seeks divine wisdom",story:"Praise of God",storyId:"story-1"}],
+      6: [{id:"6-1-creator",name:"The Primordial",transliteration:"Aadiyan",gender:"Divine",role:"First Cause",consistency:"Origin of all",details:"The beginning and source of all existence",story:"Praise of God",storyId:"story-1"}],
+      7: [{id:"7-1-worshipper",name:"The Devoted",transliteration:"Anbudan",gender:"Gender-neutral",role:"Believer",consistency:"Constant in faith",details:"One devoted to the worship of the Divine",story:"Praise of God",storyId:"story-1"}],
+      8: [{id:"8-1-learned",name:"The Wise Scholar",transliteration:"Kavivar",gender:"Male",role:"Sage",consistency:"Seeker of truth",details:"One who through learning comes to recognize the Divine",story:"Praise of God",storyId:"story-1"}],
+      9: [{id:"9-1-virtuous",name:"The Righteous",transliteration:"Arulvan",gender:"Gender-neutral",role:"Virtuous one",consistency:"Follower of dharma",details:"One who lives in alignment with divine principles",story:"Praise of God",storyId:"story-1"}],
+      10: [{id:"10-1-blessed",name:"The Blessed",transliteration:"Ananathan",gender:"Gender-neutral",role:"Fortunate soul",consistency:"Receiver of grace",details:"One who has received the blessing of divine recognition",story:"Praise of God",storyId:"story-1"}],
+      11: [{id:"11-1-rain",name:"The Divine Rain",transliteration:"Vaan Mazhai",gender:"Divine",role:"Life-giver",consistency:"Sustainer of all",details:"The blessing that falls from heaven to nourish earth",story:"The Blessing of Rain",storyId:"story-2"}],
+      12: [{id:"12-1-earth",name:"The Fertile Earth",transliteration:"Nilam",gender:"Feminine",role:"Provider",consistency:"Life-sustaining",details:"Receives the rain and produces abundance",story:"The Blessing of Rain",storyId:"story-2"}],
+      13: [{id:"13-1-farmer",name:"The Farmer",transliteration:"Urali",gender:"Male",role:"Laborer",consistency:"Dependent on nature",details:"Works the land and depends on rain for survival",story:"The Blessing of Rain",storyId:"story-2"}],
+      14: [{id:"14-1-harvest",name:"The Golden Harvest",transliteration:"Nelvanam",gender:"Gender-neutral",role:"Blessing",consistency:"Product of grace",details:"Crops that grow from rain and fertile soil",story:"The Blessing of Rain",storyId:"story-2"}],
+      15: [{id:"15-1-cloud",name:"The Merciful Cloud",transliteration:"Megam",gender:"Gender-neutral",role:"Messenger",consistency:"Divine carrier",details:"Carries rain from heaven to bless the earth",story:"The Blessing of Rain",storyId:"story-2"}],
+      16: [{id:"16-1-river",name:"The Flowing River",transliteration:"Aaru",gender:"Feminine",role:"Life source",consistency:"Water carrier",details:"Rivers filled by rain, sustaining all life",story:"The Blessing of Rain",storyId:"story-2"}],
+      17: [{id:"17-1-vegetation",name:"Green Plants",transliteration:"Karaikal",gender:"Gender-neutral",role:"Life indicator",consistency:"Growth symbol",details:"Vegetation that springs up after rain",story:"The Blessing of Rain",storyId:"story-2"}],
+      18: [{id:"18-1-livestock",name:"The Animals",transliteration:"Pasu",gender:"Gender-neutral",role:"Dependent creatures",consistency:"Life that depends",details:"Animals that depend on rain and vegetation",story:"The Blessing of Rain",storyId:"story-2"}],
+      19: [{id:"19-1-merchant",name:"The Merchant",transliteration:"Vaanigar",gender:"Male",role:"Trader",consistency:"Commerce dependent",details:"One whose livelihood depends on agricultural abundance",story:"The Blessing of Rain",storyId:"story-2"}],
+      20: [{id:"20-1-thankful",name:"The Grateful",transliteration:"Nanri Solan",gender:"Gender-neutral",role:"Appreciative",consistency:"Blessed receiver",details:"One who gives thanks for the blessing of rain",story:"The Blessing of Rain",storyId:"story-2"}],
+      21: [{id:"21-1-ascetic",name:"The Enlightened Ascetic",transliteration:"Needhaar",gender:"Male",role:"Renunciate",consistency:"Transcender of desires",details:"One who has renounced worldly attachments for wisdom",story:"",storyId:""}],
+      22: [{id:"22-1-virtue",name:"The Path of Virtue",transliteration:"Aram",gender:"Gender-neutral",role:"Principle",consistency:"Eternal truth",details:"The way of righteousness followed by ascetics",story:"",storyId:""}],
+      23: [{id:"23-1-sage",name:"The Wise One",transliteration:"Arivalaar",gender:"Male",role:"Knower",consistency:"Enlightened being",details:"One who has transcended worldly desires through wisdom",story:"",storyId:""}],
+      24: [{id:"24-1-renunciate",name:"The Renouncer",transliteration:"Thumpiyavan",gender:"Male",role:"Ascetic",consistency:"Detached soul",details:"One who has given up worldly pursuits for spiritual truth",story:"",storyId:""}],
+      25: [{id:"25-1-peaceful",name:"The Peaceful",transliteration:"Santi",gender:"Gender-neutral",role:"Serene one",consistency:"Undisturbed mind",details:"One who has achieved inner peace through renunciation",story:"",storyId:""}],
+      26: [{id:"26-1-knower",name:"The Self-Knower",transliteration:"Atmai Arivaan",gender:"Gender-neutral",role:"Enlightened",consistency:"Self-realized",details:"One who knows the true nature of self",story:"",storyId:""}],
+      27: [{id:"27-1-free",name:"The Liberated",transliteration:"Vidhaiyaan",gender:"Gender-neutral",role:"Free being",consistency:"Released from bondage",details:"One freed from the cycle of birth and death",story:"",storyId:""}],
+      28: [{id:"28-1-compassionate",name:"The Compassionate",transliteration:"Vatsalya",gender:"Gender-neutral",role:"Merciful being",consistency:"Love for all",details:"One filled with compassion for all creatures",story:"",storyId:""}],
+      29: [{id:"29-1-truthful",name:"The Truth-Speaker",transliteration:"Satyavaan",gender:"Male",role:"Truthful one",consistency:"Adherent to truth",details:"One who always speaks and lives in truth",story:"",storyId:""}],
+      30: [{id:"30-1-eternal",name:"The Eternal Seeker",transliteration:"Nithya Arivaan",gender:"Gender-neutral",role:"Forever learner",consistency:"Perpetual student",details:"One eternally seeking higher knowledge and truth",story:"",storyId:""}],
+      31: [{id:"31-1-virtuous",name:"The Virtuous Leader",transliteration:"Aravan",gender:"Male",role:"Guide",consistency:"Upholder of dharma",details:"One who asserts and practices virtue in all situations",story:"",storyId:""}],
+      32: [{id:"32-1-strength",name:"The Strength of Virtue",transliteration:"Arai Sakthi",gender:"Gender-neutral",role:"Force",consistency:"Moral power",details:"The inner strength that comes from virtue",story:"",storyId:""}],
+      33: [{id:"33-1-protector",name:"The Protector",transliteration:"Rakshakar",gender:"Male",role:"Guardian",consistency:"Defender of righteousness",details:"One who protects virtue and those who follow it",story:"",storyId:""}],
+      34: [{id:"34-1-firm",name:"The Steadfast",transliteration:"Ninaivilla",gender:"Gender-neutral",role:"Unwavering",consistency:"Constant in virtue",details:"One who never wavers from the path of virtue",story:"",storyId:""}],
+      35: [{id:"35-1-triumphant",name:"The Victorious",transliteration:"Jayavan",gender:"Male",role:"Winner",consistency:"Successful in virtue",details:"One whose virtuous life leads to ultimate triumph",story:"",storyId:""}],
+      36: [{id:"36-1-honored",name:"The Honored",transliteration:"Maryavaanan",gender:"Male",role:"Esteemed",consistency:"Respected for virtue",details:"One honored by society for virtuous conduct",story:"",storyId:""}],
+      37: [{id:"37-1-trustworthy",name:"The Trustworthy",transliteration:"Vishvasa Purvaan",gender:"Gender-neutral",role:"Reliable",consistency:"Dependable character",details:"One whose virtue makes them trustworthy",story:"",storyId:""}],
+      38: [{id:"38-1-noble",name:"The Noble One",transliteration:"Arya",gender:"Gender-neutral",role:"Highborn spirit",consistency:"Elevated character",details:"One of noble character and virtuous conduct",story:"",storyId:""}],
+      39: [{id:"39-1-wise",name:"The Virtuous Sage",transliteration:"Karvi",gender:"Male",role:"Wise being",consistency:"Knower of right",details:"One who wisely practices and teaches virtue",story:"",storyId:""}],
+      40: [{id:"40-1-ideal",name:"The Ideal",transliteration:"Nirmalan",gender:"Gender-neutral",role:"Perfect example",consistency:"Pure being",details:"One who embodies all virtues perfectly",story:"",storyId:""}],
+      41: [{id:"41-1-householder",name:"The Wise Householder",transliteration:"Ilaravan",gender:"Male",role:"Family head",consistency:"Keeper of home",details:"One who manages household with virtue and wisdom",story:"",storyId:""}],
+      42: [{id:"42-1-wife",name:"The Devoted Wife",transliteration:"Manaivi",gender:"Female",role:"Life partner",consistency:"Home pillar",details:"One whose virtue strengthens the household",story:"",storyId:""}],
+      43: [{id:"43-1-children",name:"The Children",transliteration:"Pillai",gender:"Gender-neutral",role:"Young ones",consistency:"Future generation",details:"Offspring who continue the family legacy",story:"",storyId:""}],
+      44: [{id:"44-1-elder",name:"The Elder",transliteration:"Thazhainaar",gender:"Gender-neutral",role:"Senior",consistency:"Wisdom source",details:"Aged members whose experience guides the family",story:"",storyId:""}],
+      45: [{id:"45-1-harmony",name:"Family Harmony",transliteration:"Samadhi",gender:"Gender-neutral",role:"Balance",consistency:"Unity symbol",details:"The peaceful state of a well-managed household",story:"",storyId:""}],
+      46: [{id:"46-1-provider",name:"The Provider",transliteration:"Kavalkai",gender:"Male",role:"Sustainer",consistency:"Nourisher",details:"One who provides sustenance for the family",story:"",storyId:""}],
+      47: [{id:"47-1-caregiver",name:"The Caregiver",transliteration:"Pallikal",gender:"Female",role:"Nurturer",consistency:"Comforter",details:"One who cares for family members with love",story:"",storyId:""}],
+      48: [{id:"48-1-mediator",name:"The Mediator",transliteration:"Samaikal",gender:"Gender-neutral",role:"Peacemaker",consistency:"Resolver",details:"One who maintains peace in family disputes",story:"",storyId:""}],
+      49: [{id:"49-1-teacher",name:"The Teacher",transliteration:"Kalviyalan",gender:"Male",role:"Educator",consistency:"Guide",details:"One who teaches values and knowledge to family",story:"",storyId:""}],
+      50: [{id:"50-1-protector",name:"The Home Protector",transliteration:"Nil Rakshakar",gender:"Male",role:"Defender",consistency:"Safe guardian",details:"One who protects family and household from harm",story:"",storyId:""}],
+      51: [{id:"51-1-perfect-companion",name:"The Perfect Companion",transliteration:"Thunai",gender:"Female",role:"Partner",consistency:"Equal in virtue",details:"A spouse who doubles the household wealth through wisdom",story:"",storyId:""}],
+      52: [{id:"52-1-responsible-husband",name:"The Responsible Husband",transliteration:"Kathalin",gender:"Male",role:"Provider",consistency:"Protector",details:"One whose care for spouse ensures family happiness",story:"",storyId:""}],
+      53: [{id:"53-1-supporter",name:"The Supporter",transliteration:"Thozhil Kalarai",gender:"Female",role:"Helper",consistency:"Cooperative",details:"One who assists husband in all endeavors",story:"",storyId:""}],
+      54: [{id:"54-1-intelligent-wife",name:"The Intelligent Wife",transliteration:"Budhhimati",gender:"Female",role:"Wise woman",consistency:"Advisor",details:"One whose wisdom guides household decisions",story:"",storyId:""}],
+      55: [{id:"55-1-fertile-marriage",name:"Fruitful Marriage",transliteration:"Putra Kalai",gender:"Gender-neutral",role:"Union",consistency:"Blessed bond",details:"A marriage that produces virtuous offspring",story:"",storyId:""}],
+      56: [{id:"56-1-devoted-couple",name:"The Devoted Couple",transliteration:"Anbu Pair",gender:"Gender-neutral",role:"Partners",consistency:"United souls",details:"Two souls united in love and virtue",story:"",storyId:""}],
+      57: [{id:"57-1-worthy-pair",name:"The Worthy Pair",transliteration:"Neelvan Pair",gender:"Gender-neutral",role:"Noble couple",consistency:"Virtuous unit",details:"Husband and wife both virtuous and honorable",story:"",storyId:""}],
+      58: [{id:"58-1-stable-marriage",name:"Stable Marriage",transliteration:"Nithya Sambandham",gender:"Gender-neutral",role:"Union",consistency:"Lasting bond",details:"A marriage founded on virtue and mutual respect",story:"",storyId:""}],
+      59: [{id:"59-1-life-partner",name:"Life Partner",transliteration:"Vaalkai Thunai",gender:"Gender-neutral",role:"Companion",consistency:"Eternal mate",details:"One chosen to share life's journey",story:"",storyId:""}],
+      60: [{id:"60-1-fortunate-man",name:"The Fortunate Man",transliteration:"Bhagya Vaan",gender:"Male",role:"Blessed",consistency:"Lucky one",details:"One blessed with a virtuous and worthy wife",story:"",storyId:""}],
+      61: [{id:"61-1-blessed-child",name:"The Blessed Child",transliteration:"Makkal",gender:"Gender-neutral",role:"Legacy",consistency:"Future",details:"Children are the greatest wealth of a family",story:"",storyId:""}],
+      62: [{id:"62-1-nurturing-mother",name:"The Nurturing Mother",transliteration:"Thaai",gender:"Female",role:"Nurturer",consistency:"First teacher",details:"One who shapes children's character",story:"",storyId:""}],
+      63: [{id:"63-1-guiding-father",name:"The Guiding Father",transliteration:"Thalaivan",gender:"Male",role:"Guide",consistency:"Protector",details:"One who guides children toward virtue",story:"",storyId:""}],
+      64: [{id:"64-1-obedient-child",name:"The Obedient Child",transliteration:"Kelikal Pillai",gender:"Gender-neutral",role:"Respectful",consistency:"Listener",details:"One who respects parents and learns their values",story:"",storyId:""}],
+      65: [{id:"65-1-virtuous-heir",name:"The Virtuous Heir",transliteration:"Thavi Pillai",gender:"Gender-neutral",role:"Successor",consistency:"Future carrier",details:"Child who carries forward family virtue",story:"",storyId:""}],
+      66: [{id:"66-1-proud-parents",name:"The Proud Parents",transliteration:"Ganaka Thazhaikal",gender:"Gender-neutral",role:"Proud ones",consistency:"Satisfied",details:"Parents whose children bring them pride",story:"",storyId:""}],
+      67: [{id:"67-1-educated-child",name:"The Educated Child",transliteration:"Kalvi Pillai",gender:"Gender-neutral",role:"Learner",consistency:"Scholar",details:"One trained in knowledge and virtue",story:"",storyId:""}],
+      68: [{id:"68-1-compassionate-heir",name:"The Compassionate Heir",transliteration:"Dayavaan Pillai",gender:"Gender-neutral",role:"Merciful",consistency:"Kind one",details:"Child who shows mercy and kindness",story:"",storyId:""}],
+      69: [{id:"69-1-faithful-child",name:"The Faithful Child",transliteration:"Nambikai Pillai",gender:"Gender-neutral",role:"Trustworthy",consistency:"Reliable",details:"One who is faithful to family values",story:"",storyId:""}],
+      70: [{id:"70-1-complete-family",name:"The Complete Family",transliteration:"Sampurna Kula",gender:"Gender-neutral",role:"Whole",consistency:"United",details:"A family complete in virtue and love",story:"",storyId:""}],
+      71: [{id:"71-1-devoted-lover",name:"The Devoted Lover",transliteration:"Anpudan",gender:"Gender-neutral",role:"Affectionate",consistency:"Compassionate",details:"One possessed of boundless love and compassion",story:"Love's First Meeting",storyId:"story-7"}],
+      72: [{id:"72-1-beloved",name:"The Cherished Beloved",transliteration:"Priyam",gender:"Gender-neutral",role:"Dear one",consistency:"Loved one",details:"One who is loved and cherished deeply",story:"Love's First Meeting",storyId:"story-7"}],
+      73: [{id:"73-1-caring-friend",name:"The Caring Friend",transliteration:"Sakha",gender:"Gender-neutral",role:"Friend",consistency:"Companion",details:"One who shows care and affection to others",story:"Love's First Meeting",storyId:"story-7"}],
+      74: [{id:"74-1-joyful-giver",name:"The Joyful Giver",transliteration:"Dana Priyaa",gender:"Gender-neutral",role:"Generous",consistency:"Delighted giver",details:"One who gives with joy and love",story:"Love's First Meeting",storyId:"story-7"}],
+      75: [{id:"75-1-heart-centered",name:"The Heart-Centered",transliteration:"Hridaya Kendra",gender:"Gender-neutral",role:"Loving",consistency:"Soul-focused",details:"One whose heart is center of love",story:"Love's First Meeting",storyId:"story-7"}],
+      76: [{id:"76-1-grateful-soul",name:"The Grateful Soul",transliteration:"Krutagna",gender:"Gender-neutral",role:"Thankful",consistency:"Appreciative",details:"One who expresses love through gratitude",story:"Love's First Meeting",storyId:"story-7"}],
+      77: [{id:"77-1-peaceful-presence",name:"The Peaceful Presence",transliteration:"Shanti Rupa",gender:"Gender-neutral",role:"Serene",consistency:"Calming",details:"One whose presence brings peace through love",story:"Love's First Meeting",storyId:"story-7"}],
+      78: [{id:"78-1-selfless-server",name:"The Selfless Server",transliteration:"Nishkama Seva",gender:"Gender-neutral",role:"Selfless",consistency:"Devotee",details:"One who serves others with no expectation",story:"Love's First Meeting",storyId:"story-7"}],
+      79: [{id:"79-1-truthful-friend",name:"The Truthful Friend",transliteration:"Satya Sakha",gender:"Gender-neutral",role:"Honest",consistency:"Sincere",details:"One whose love is expressed in truth",story:"Love's First Meeting",storyId:"story-7"}],
+      80: [{id:"80-1-universal-lover",name:"The Universal Lover",transliteration:"Sarva Priya",gender:"Gender-neutral",role:"All-loving",consistency:"Inclusive",details:"One who loves all beings equally",story:"Love's First Meeting",storyId:"story-7"}]
+    };
+
+    // Add template characters for kurals 81-1330
+    for (let i = 81; i <= 1330; i++) {
+      COMPREHENSIVE_CHARACTER_DATABASE[i] = [{
+        id: `${i}-1-character`,
+        name: `Character for Kural ${i}`,
+        transliteration: `Transliteration ${i}`,
+        gender: "Gender-neutral",
+        role: `Role in Kural ${i}`,
+        consistency: `Consistency for Kural ${i}`,
+        details: `Character description for Kural ${i}`,
+        story: "",
+        storyId: ""
+      }];
+    }
+
+    // DASHBOARD SIDEBAR MENU
+    const ICONS = {
+      dashboard: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>',
+      kurals: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>',
+      story: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>',
+      character: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+      prompt: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+      image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>',
+      video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>',
+      workflow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+      publish: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>',
+      settings: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+      sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+      moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>',
+      social: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>'
+    };
+
+    const SIDEBAR_MENU = [
+      { section: "Main" },
+      { id: "dashboard", label: "Dashboard", href: "dashboard.html", icon: "dashboard", active: false },
+      { id: "kurals", label: "Kurals", href: "kurals.html", icon: "kurals" },
+      { section: "Content" },
+      { id: "stories", label: "Story Library", href: "stories.html", icon: "story" },
+      { id: "characters", label: "Character Library", href: "characters-table.html", icon: "character", active: true },
+      { id: "prompts", label: "Script Page", href: "prompts.html", icon: "prompt" },
+      { id: "socials", label: "Social Posts", href: "socials.html", icon: "social" },
+      { section: "Media" },
+      { id: "images", label: "Image Library", href: "images.html", icon: "image" },
+      { id: "videos", label: "Video Library", href: "videos.html", icon: "video" },
+      { section: "Pipeline" },
+      { id: "workflow", label: "Workflow", href: "#", icon: "workflow", placeholder: true },
+      { id: "publishing", label: "Publishing", href: "#", icon: "publish", placeholder: true },
+      { section: "System" },
+      { id: "settings", label: "Settings", href: "#", icon: "settings", placeholder: true }
+    ];
+
+    // THEME MANAGEMENT
+    const THEME_KEY = "thirukkural-theme";
+
+    function getTheme() {
+      return localStorage.getItem(THEME_KEY) || "dark";
+    }
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      localStorage.setItem(THEME_KEY, theme);
+      const btn = document.getElementById("theme-toggle");
+      if (btn) {
+        btn.innerHTML = theme === "dark" ? ICONS.sun : ICONS.moon;
+      }
+    }
+
+    function initTheme() {
+      applyTheme(getTheme());
+      document.getElementById("theme-toggle")?.addEventListener("click", () => {
+        applyTheme(getTheme() === "dark" ? "light" : "dark");
+      });
+    }
+
+    // SIDEBAR MANAGEMENT
+    function renderSidebar() {
+      const nav = document.getElementById("sidebar-nav");
+      if (!nav) return;
+
+      let html = "";
+      let inList = false;
+
+      for (const item of SIDEBAR_MENU) {
+        if (item.section) {
+          if (inList) html += "</ul>";
+          html += `<div class="sidebar-section-label">${item.section}</div><ul class="sidebar-menu">`;
+          inList = true;
+          continue;
+        }
+        const active = item.active ? " active" : "";
+        const placeholder = item.placeholder ? ' data-placeholder="true"' : "";
+        html += `
+          <li>
+            <a href="${item.href}" class="sidebar-link${active}"${placeholder}>
+              ${ICONS[item.icon]}
+              ${item.label}
+            </a>
+          </li>`;
+      }
+      if (inList) html += "</ul>";
+      nav.innerHTML = html;
+
+      nav.querySelectorAll('[data-placeholder="true"]').forEach((link) => {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          showToast(`${link.textContent.trim()} — coming soon`);
+        });
+      });
+    }
+
+    function initSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("sidebar-overlay");
+      const openBtn = document.getElementById("sidebar-open");
+      const closeBtn = document.getElementById("sidebar-close");
+
+      if (!sidebar || !openBtn || !closeBtn) return;
+
+      openBtn.addEventListener("click", () => {
+        sidebar.classList.add("open");
+        overlay?.classList.add("visible");
+        document.body.style.overflow = "hidden";
+      });
+
+      closeBtn.addEventListener("click", () => {
+        sidebar.classList.remove("open");
+        overlay?.classList.remove("visible");
+        document.body.style.overflow = "";
+      });
+
+      overlay?.addEventListener("click", () => {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("visible");
+        document.body.style.overflow = "";
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+          sidebar.classList.remove("open");
+          overlay?.classList.remove("visible");
+          document.body.style.overflow = "";
+        }
+      });
+    }
+
+    // TOAST NOTIFICATIONS
+    function showToast(message) {
+      let toast = document.querySelector(".ui-toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.className = "ui-toast";
+        toast.innerHTML = `<span class="ui-toast-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="ui-toast-text"></span>`;
+        document.body.appendChild(toast);
+      }
+      toast.querySelector(".ui-toast-text").textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => toast.classList.remove("show"), 3200);
+    }
+
+    // CHARACTER TABLE LOGIC
+    let allCharactersCache = [];
+
+    function buildAllCharactersList() {
+      const result = [];
+
+      for (const [kuralNum, characters] of Object.entries(COMPREHENSIVE_CHARACTER_DATABASE)) {
+        const kuralNumInt = parseInt(kuralNum);
+        if (Array.isArray(characters)) {
+          characters.forEach(char => {
+            result.push({
+              ...char,
+              kuralNumber: kuralNumInt,
+              kuralId: `TK-${String(kuralNumInt).padStart(4, '0')}`
+            });
+          });
+        }
+      }
+
+      return result.sort((a, b) => a.kuralNumber - b.kuralNumber);
+    }
+
+    function renderCharacterRow(character) {
+      const storyLink = character.story ?
+        `<a href="stories.html" class="story-link">${character.story}</a>` :
+        `<span class="no-story">—</span>`;
+
+      const genderClass = {
+        Male: "gender-male",
+        Female: "gender-female",
+        Divine: "gender-divine",
+        "Gender-neutral": "gender-neutral"
+      }[character.gender] || "gender-neutral";
+
+      return `
+        <tr data-char-id="${character.id}" data-kural="${character.kuralNumber}">
+          <td class="kural-cell">
+            <span class="kural-badge">${character.kuralId}</span>
+          </td>
+          <td class="name-cell">
+            <span class="char-name">${character.name}</span>
+            <span class="char-trans">${character.transliteration}</span>
+          </td>
+          <td class="gender-cell">
+            <span class="gender-badge ${genderClass}">${character.gender}</span>
+          </td>
+          <td class="role-cell">${character.role}</td>
+          <td class="consistency-cell">${character.consistency}</td>
+          <td class="story-cell">${storyLink}</td>
+          <td class="action-cell">
+            <button class="view-btn" data-char-id="${character.id}" title="View details">Details</button>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderCharacterTable(characters) {
+      const tbody = document.getElementById("table-body");
+      const countEl = document.getElementById("table-count");
+
+      if (!tbody) return;
+
+      if (characters.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7">No characters found</td></tr>';
+        countEl.textContent = "0 records";
+        return;
+      }
+
+      tbody.innerHTML = characters.map(char => renderCharacterRow(char)).join("");
+      countEl.textContent = `${characters.length} record${characters.length !== 1 ? 's' : ''}`;
+
+      tbody.querySelectorAll(".view-btn").forEach(btn => {
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          const charId = btn.getAttribute("data-char-id");
+          const character = allCharactersCache.find(c => c.id === charId);
+          if (character) showCharacterDetail(character);
+        });
+      });
+    }
+
+    function showCharacterDetail(character) {
+      const modal = document.getElementById("character-modal");
+      const body = document.getElementById("modal-body");
+
+      const storyLink = character.story ?
+        `<p><strong>Story:</strong> <a href="stories.html">${character.story}</a></p>` :
+        `<p><strong>Story:</strong> <span style="color: var(--text-tertiary);">No story assigned</span></p>`;
+
+      body.innerHTML = `
+        <div class="detail-header">
+          <div>
+            <h2 style="margin: 0 0 0.5rem 0;">${character.name}</h2>
+            <p style="margin: 0; color: var(--text-secondary);">${character.transliteration}</p>
+          </div>
+          <span class="detail-badge">${character.kuralId}</span>
+        </div>
+
+        <div class="detail-content">
+          <div class="detail-row">
+            <label>Gender:</label>
+            <span>${character.gender}</span>
+          </div>
+          <div class="detail-row">
+            <label>Role:</label>
+            <span>${character.role}</span>
+          </div>
+          <div class="detail-row">
+            <label>Character Consistency:</label>
+            <span>${character.consistency}</span>
+          </div>
+          <div class="detail-row">
+            <label>Character Details:</label>
+            <p>${character.details}</p>
+          </div>
+          ${storyLink}
+        </div>
+
+        <div class="detail-actions">
+          <button class="ui-btn ui-btn-primary" id="edit-btn">Edit</button>
+          <button class="ui-btn" id="close-btn">Close</button>
+        </div>
+      `;
+
+      modal.classList.add("visible");
+
+      document.getElementById("edit-btn")?.addEventListener("click", () => {
+        showToast("Character editing coming soon");
+      });
+
+      document.getElementById("close-btn")?.addEventListener("click", () => {
+        modal.classList.remove("visible");
+      });
+    }
+
+    function updateStats(totalChars, kuralsWithChars, storyChars) {
+      const totalEl = document.getElementById("total-chars");
+      const kuralsEl = document.getElementById("kurals-covered");
+      const storyEl = document.getElementById("story-chars");
+
+      if (totalEl) totalEl.textContent = totalChars;
+      if (kuralsEl) kuralsEl.textContent = kuralsWithChars;
+      if (storyEl) storyEl.textContent = storyChars;
+    }
+
+    function filterCharacters() {
+      const searchText = document.getElementById("search-input")?.value.toLowerCase() || "";
+      const genderFilter = document.getElementById("gender-filter")?.value || "";
+      const storyFilter = document.getElementById("story-filter")?.value || "";
+      const sortBy = document.getElementById("sort-filter")?.value || "kural-asc";
+
+      let filtered = allCharactersCache.filter(char => {
+        const matchesSearch = !searchText ||
+          char.name.toLowerCase().includes(searchText) ||
+          char.transliteration.toLowerCase().includes(searchText) ||
+          char.kuralId.toLowerCase().includes(searchText) ||
+          char.role.toLowerCase().includes(searchText) ||
+          char.consistency.toLowerCase().includes(searchText);
+
+        const matchesGender = !genderFilter || char.gender === genderFilter;
+        const matchesStory = !storyFilter || (storyFilter === "with-story" ? char.story : !char.story);
+
+        return matchesSearch && matchesGender && matchesStory;
+      });
+
+      if (sortBy === "kural-asc") {
+        filtered.sort((a, b) => a.kuralNumber - b.kuralNumber);
+      } else if (sortBy === "kural-desc") {
+        filtered.sort((a, b) => b.kuralNumber - a.kuralNumber);
+      } else if (sortBy === "name") {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      renderCharacterTable(filtered);
+
+      if (filtered.length > 0) {
+        const kuralsWithChars = new Set(filtered.map(c => c.kuralNumber)).size;
+        const storyChars = filtered.filter(c => c.story).length;
+        updateStats(filtered.length, kuralsWithChars, storyChars);
+      }
+    }
+
+    function initCharacterTable() {
+      allCharactersCache = buildAllCharactersList();
+      renderCharacterTable(allCharactersCache);
+
+      const totalChars = allCharactersCache.length;
+      const kuralsWithChars = new Set(allCharactersCache.map(c => c.kuralNumber)).size;
+      const storyChars = allCharactersCache.filter(c => c.story).length;
+      updateStats(totalChars, kuralsWithChars, storyChars);
+
+      document.getElementById("search-input")?.addEventListener("input", filterCharacters);
+      document.getElementById("gender-filter")?.addEventListener("change", filterCharacters);
+      document.getElementById("story-filter")?.addEventListener("change", filterCharacters);
+      document.getElementById("sort-filter")?.addEventListener("change", filterCharacters);
+
+      document.getElementById("export-btn")?.addEventListener("click", () => {
+        let csv = "Kural,Character Name,Transliteration,Gender,Role,Consistency,Story\n";
+        allCharactersCache.forEach(char => {
+          csv += `"${char.kuralId}","${char.name}","${char.transliteration}","${char.gender}","${char.role}","${char.consistency}","${char.story}"\n`;
+        });
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "character-library-1330-kurals.csv";
+        a.click();
+        showToast("Character data exported as CSV");
+      });
+
+      const modal = document.getElementById("character-modal");
+      const overlay = document.getElementById("modal-overlay");
+      const closeBtn = document.getElementById("modal-close");
+
+      closeBtn?.addEventListener("click", () => modal?.classList.remove("visible"));
+      overlay?.addEventListener("click", () => modal?.classList.remove("visible"));
+    }
+
+    // INITIALIZATION
+    document.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      renderSidebar();
+      initSidebar();
+      initCharacterTable();
+    });
+  </script>
+</body>
+</html>

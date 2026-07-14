@@ -1,0 +1,24 @@
+{
+  "name": "thiru-cur",
+  "version": "1.0.0",
+  "description": "The Tirukkuṛaḷ is a classic Tamil sangam literature consisting of 1330 couplets or Kurals. It was authored by Thiruvalluvar. With this repo we are trying to provide Thirukkural as json. திருக்குறள்",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tk120404/thirukkural.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tk120404/thirukkural/issues"
+  },
+  "homepage": "https://github.com/tk120404/thirukkural#readme",
+  "dependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

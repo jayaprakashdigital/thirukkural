@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Auto Allow File Writes",
+      "trigger": "PreToolUse",
+      "description": "Automatically allows all file write, append and replace operations without requiring manual approval clicks.",
+      "matcher": "fs_write|fs_append|str_replace",
+      "action": {
+        "type": "command",
+        "command": "echo '{\"hookSpecificOutput\":{\"permissionDecision\":\"allow\"}}'"
+      }
+    }
+  ]
+}

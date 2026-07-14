@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Library — AI Content Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/components.css?v=3">
+  <link rel="stylesheet" href="css/dashboard.css?v=3">
+  <link rel="stylesheet" href="css/library.css?v=3">
+  <script>
+    (function () {
+      var t = localStorage.getItem("thirukkural-theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body class="dashboard-body">
+  <div class="bg-scene" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="sidebar-brand">
+          <span class="sidebar-brand-icon">AI</span>
+          <span class="sidebar-brand-text">
+            <strong>Content Studio</strong>
+            <span>Thirukkural Project</span>
+          </span>
+        </a>
+        <button type="button" class="ui-btn-icon sidebar-close" id="sidebar-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Admin navigation"></nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Back to Public Site
+        </a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="ui-btn-icon topbar-menu-btn" id="sidebar-open" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="topbar-title">Video Library</h1>
+            <div class="topbar-breadcrumb">
+              <span>Admin</span>
+              <span>/</span>
+              <span>Media</span>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="ui-btn-icon" id="theme-toggle" aria-label="Switch theme"></button>
+          <div class="topbar-user">
+            <span class="topbar-avatar">AD</span>
+            <span class="topbar-user-info">
+              <span class="topbar-user-name">Admin</span>
+              <span class="topbar-user-role">Content Manager</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content">
+        <section class="library-header">
+          <div>
+            <h1>Generated Videos</h1>
+            <p>View and manage all generated video content with publishing controls</p>
+          </div>
+          <button type="button" class="ui-btn ui-btn-primary" id="generate-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+            Generate Video
+          </button>
+        </section>
+
+        <section class="library-filters">
+          <div class="filter-group">
+            <label for="search-input">Search</label>
+            <input type="text" id="search-input" class="filter-input" placeholder="Search by title, kural, or tag...">
+          </div>
+          <div class="filter-group">
+            <label for="status-filter">Status</label>
+            <select id="status-filter" class="filter-select">
+              <option value="">All</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="rendering">Rendering</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="sort-filter">Sort by</label>
+            <select id="sort-filter" class="filter-select">
+              <option value="kural-asc">Kural (1–1330)</option>
+              <option value="kural-desc">Kural (1330–1)</option>
+              <option value="duration">Duration</option>
+              <option value="name">Chapter (A-Z)</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="library-content">
+          <div class="library-stats">
+            <span id="video-count">1330</span> videos
+          </div>
+          <div class="library-grid" id="videos-grid"></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="js/dashboard.js?v=4"></script>
+  <script src="js/media-data.js?v=3"></script>
+  <script src="js/library.js?v=3"></script>
+</body>
+</html>
