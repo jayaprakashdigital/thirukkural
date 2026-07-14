@@ -252,6 +252,16 @@
   border-color: var(--accent-color);
 }
 
+/* Scene-based script cards (TK-0001–TK-0010) */
+.scene-script-card .prompt-card-footer {
+  flex-wrap: wrap;
+}
+
+.scene-script-btn {
+  flex: 1 1 28%;
+  min-width: 88px;
+}
+
 /* Empty State */
 .prompt-empty {
   display: none;

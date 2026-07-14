@@ -80,21 +80,56 @@ function showToast(message) {
 // ===== PROMPT LIBRARY LOGIC =====
 let allPromptsCache = [];
 
+// Scene-based scripts (TK-0001–TK-0010) supersede their legacy flat-prompt
+// entries on this list; kurals outside the MVP scope keep the old card/modal.
 function buildAllPromptsList() {
   const result = [];
-  const kuralsWithPrompts = getKuralsWithPrompts();
 
-  kuralsWithPrompts.forEach(kuralNum => {
+  getAllScripts().forEach(script => {
+    result.push({ type: "scene", kuralNumber: script.kuralNumber, data: script });
+  });
+
+  getKuralsWithPrompts().forEach(kuralNum => {
+    if (MVP_KURAL_NUMBERS.includes(kuralNum)) return;
     const prompt = getPromptForKural(kuralNum);
-    if (prompt) {
-      result.push(prompt);
-    }
+    if (prompt) result.push({ type: "legacy", kuralNumber: kuralNum, data: prompt });
   });
 
   return result.sort((a, b) => a.kuralNumber - b.kuralNumber);
 }
 
-function renderPromptCard(prompt) {
+function renderPromptCard(item) {
+  return item.type === "scene" ? renderSceneScriptCard(item.data) : renderLegacyPromptCard(item.data);
+}
+
+function renderSceneScriptCard(script) {
+  const status = computeScriptStatus(script);
+  return `
+    <div class="prompt-card scene-script-card" data-kural="${script.kuralNumber}">
+      <div class="prompt-card-header">
+        <div class="prompt-kural">
+          <span class="kural-badge">${script.kuralId}</span>
+        </div>
+        <span class="ui-badge ${statusBadgeClass(status)}">${status}</span>
+      </div>
+      <div class="prompt-card-content">
+        <h3 class="prompt-title">${script.title}</h3>
+        <p class="prompt-preview">${script.theme}</p>
+        <div class="prompt-meta">
+          <span class="prompt-duration">${script.scenes.length} scenes · ${formatDuration(calcTotalDuration(script))}</span>
+          <span class="prompt-story-badge">Updated ${formatUpdated(script.updatedAt)}</span>
+        </div>
+      </div>
+      <div class="prompt-card-footer">
+        <button class="prompt-action-btn scene-script-btn" data-action="view" data-kural="${script.kuralNumber}">View Script</button>
+        <button class="prompt-action-btn scene-script-btn" data-action="edit" data-kural="${script.kuralNumber}">Edit Script</button>
+        <button class="prompt-copy-btn scene-script-btn" data-action="generate" data-kural="${script.kuralNumber}">Regenerate</button>
+      </div>
+    </div>
+  `;
+}
+
+function renderLegacyPromptCard(prompt) {
   const storyBadge = prompt.story ?
     `<span class="prompt-story-badge">${prompt.story}</span>` :
     `<span class="prompt-empty-badge">No Story</span>`;
@@ -259,15 +294,39 @@ function renderPromptsList(prompts) {
   }
 
   emptyState?.classList.remove("visible");
-  list.innerHTML = prompts.map(prompt => renderPromptCard(prompt)).join("");
+  list.innerHTML = prompts.map(item => renderPromptCard(item)).join("");
 
-  // Add event listeners
-  list.querySelectorAll(".prompt-action-btn").forEach(btn => {
+  // Legacy cards (kurals outside MVP scope) open the old read-only modal.
+  list.querySelectorAll(".prompt-action-btn:not(.scene-script-btn)").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
-      const kuralNum = parseInt(btn.getAttribute("data-kural"));
-      const prompt = allPromptsCache.find(p => p.kuralNumber === kuralNum);
-      if (prompt) renderPromptDetail(prompt);
+      const kuralNum = parseInt(btn.getAttribute("data-kural"), 10);
+      const item = allPromptsCache.find(p => p.kuralNumber === kuralNum);
+      if (item) renderPromptDetail(item.data);
+    });
+  });
+
+  // Scene-based script cards (TK-0001–TK-0010) route to the Script Detail page.
+  list.querySelectorAll(".scene-script-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const kuralNum = parseInt(btn.getAttribute("data-kural"), 10);
+      const action = btn.getAttribute("data-action");
+
+      if (action === "view" || action === "edit") {
+        window.location.href = `script-detail.html?kural=${kuralNum}`;
+        return;
+      }
+
+      if (action === "generate") {
+        if (!confirm("Regenerate this script from the source story? Any manual scene edits will be lost.")) return;
+        const source = SCRIPT_SOURCE_STORIES.find(s => s.kuralNumber === kuralNum);
+        if (!source) return;
+        saveScript(kuralNum, buildScriptFromStory(source));
+        allPromptsCache = buildAllPromptsList();
+        filterPrompts();
+        showToast("Script regenerated from story");
+      }
     });
   });
 }
@@ -287,27 +346,31 @@ function filterPrompts() {
   const categoryFilter = document.getElementById("category-filter")?.value || "";
   const storyFilter = document.getElementById("story-filter")?.value || "";
 
-  let filtered = allPromptsCache.filter(prompt => {
-    const matchesSearch = !searchText ||
-      prompt.title.toLowerCase().includes(searchText) ||
-      prompt.kuralId.toLowerCase().includes(searchText) ||
-      prompt.scriptText.toLowerCase().includes(searchText);
+  const filtered = allPromptsCache.filter(item => {
+    const isScene = item.type === "scene";
+    const searchableText = isScene
+      ? `${item.data.title} ${item.data.theme} ${item.data.storyPreview}`.toLowerCase()
+      : `${item.data.title} ${item.data.scriptText}`.toLowerCase();
 
-    const matchesCategory = !categoryFilter || prompt.category === categoryFilter;
-    const matchesStory = !storyFilter || (storyFilter === "with-story" ? prompt.story : !prompt.story);
+    const matchesSearch = !searchText ||
+      item.data.kuralId.toLowerCase().includes(searchText) ||
+      searchableText.includes(searchText);
+
+    const matchesCategory = !categoryFilter || (!isScene && item.data.category === categoryFilter);
+    const hasStory = isScene ? true : !!item.data.story;
+    const matchesStory = !storyFilter || (storyFilter === "with-story" ? hasStory : !hasStory);
 
     return matchesSearch && matchesCategory && matchesStory;
   });
 
   renderPromptsList(filtered);
-  const kuralsWithScripts = new Set(filtered.map(p => p.kuralNumber)).size;
-  updateStats(filtered.length, kuralsWithScripts);
+  updateStats(filtered.length, filtered.length);
 }
 
 function initPromptLibrary() {
   allPromptsCache = buildAllPromptsList();
   renderPromptsList(allPromptsCache);
-  updateStats(getTotalPromptCount(), getKuralsWithPrompts().length);
+  updateStats(allPromptsCache.length, allPromptsCache.length);
 
   document.getElementById("search-input")?.addEventListener("input", filterPrompts);
   document.getElementById("category-filter")?.addEventListener("change", filterPrompts);
