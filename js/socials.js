@@ -1,3 +1,4 @@
+(function () {
 /**
  * Social Posts — one post per kural (all 1330), platform-wise content.
  * Reads KURAL_MEDIA (js/media-data.js) and generates Instagram / YouTube /
@@ -277,3 +278,5 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("modal-overlay")?.addEventListener("click", () => modal?.classList.remove("visible"));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") modal?.classList.remove("visible"); });
 });
+
+})();

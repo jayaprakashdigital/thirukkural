@@ -1,3 +1,4 @@
+(function () {
 /**
  * Image & Video Library — one entry per kural (all 1330).
  * Reads KURAL_MEDIA (js/media-data.js) and renders a per-kural card grid
@@ -210,3 +211,5 @@ function initLibrary() {
 }
 
 document.addEventListener("DOMContentLoaded", initLibrary);
+
+})();

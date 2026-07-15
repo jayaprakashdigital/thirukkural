@@ -1,3 +1,4 @@
+(function () {
 /* ============================================================
    Thirukkural Database — kurals.js
    Data logic + theme toggle + sidebar (admin layout)
@@ -355,3 +356,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initSidebar();
   initData();
 });
+
+})();

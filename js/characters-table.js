@@ -1,3 +1,4 @@
+(function () {
 /**
  * Character Library - Table View
  * Displays all 1330 kurals with their characters in table format
@@ -339,3 +340,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (tbody) tbody.innerHTML = '<tr class="empty-row"><td colspan="7">Error loading characters. Check console for details.</td></tr>';
   }
 });
+
+})();

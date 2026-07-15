@@ -1,3 +1,4 @@
+(function () {
 /* ============================================================
    Story Library — stories.js  v3
    Master-prompt compliant · 60–90 sec animation format
@@ -916,3 +917,5 @@ function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init);
+
+})();

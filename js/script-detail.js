@@ -1,3 +1,4 @@
+(function () {
 /**
  * Script Detail — Production Scene Editor
  * Tabbed scene editor with AI auto-generation.
@@ -985,3 +986,5 @@ function initScriptDetail() {
 }
 
 document.addEventListener("DOMContentLoaded", initScriptDetail);
+
+})();

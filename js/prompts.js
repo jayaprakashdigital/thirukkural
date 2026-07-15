@@ -1,3 +1,4 @@
+(function () {
 /**
  * Prompt Library - Video Script Management
  * Kural-wise scripts with timing, explanations, and AI prompts
@@ -394,3 +395,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initSidebar();
   initPromptLibrary();
 });
+
+})();

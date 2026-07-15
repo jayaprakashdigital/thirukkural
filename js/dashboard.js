@@ -1,3 +1,4 @@
+(function () {
 /**
  * Admin Dashboard — placeholder data & UI logic
  * No backend. No AI generation.
@@ -26,7 +27,7 @@ const SIDEBAR_MENU = [
   { id: "kurals", label: "Kurals", href: "kurals.html", icon: "kurals" },
   { section: "Content" },
   { id: "stories", label: "Story Library", href: "stories.html", icon: "story" },
-  { id: "characters", label: "Character Library", href: "characters-table.html", icon: "character" },
+  { id: "characters", label: "Character Library", href: "characters.html", icon: "character" },
   { id: "prompts", label: "Script Page", href: "prompts.html", icon: "prompt" },
   { id: "socials", label: "Social Posts", href: "socials.html", icon: "social" },
   { section: "Media" },
@@ -248,3 +249,5 @@ function initDashboard() {
 }
 
 document.addEventListener("DOMContentLoaded", initDashboard);
+
+})();
