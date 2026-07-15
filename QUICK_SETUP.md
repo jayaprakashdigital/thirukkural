@@ -124,7 +124,7 @@ cd C:\Users\JP\Documents\thiru-cur
 echo "# Test" >> TEST.md
 git add TEST.md
 git commit -m "Test webhook deployment"
-git push origin master
+git push origin main
 
 # Check VPS logs (on VPS):
 pm2 logs thirukkural-webhook
@@ -165,7 +165,7 @@ pm2 logs thirukkural-webhook
 ### Manually pull latest code:
 ```bash
 cd /home/jp-ai-content-studios/thirukkural
-git pull origin master
+git pull origin main
 ```
 
 ### Restart webhook:
@@ -190,9 +190,9 @@ tail -f /var/log/thirukkural-deploy.log
 
 🚀 **You're Done!**
 
-Push to master, and your site updates automatically!
+Push to main, and your site updates automatically!
 
 ```bash
-git push origin master
+git push origin main
 # Site updates in seconds!
 ```

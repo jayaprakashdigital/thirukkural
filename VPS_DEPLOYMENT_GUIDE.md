@@ -50,7 +50,7 @@ cd /home/jp-ai-content-studios
 # Clone the repository (or update if it exists)
 if [ -d "thirukkural" ]; then
     cd thirukkural
-    git pull origin master
+    git pull origin main
 else
     git clone https://github.com/jayaprakashdigital/thirukkural.git
     cd thirukkural
@@ -132,7 +132,7 @@ echo "[$(date)] Deployment started" >> $LOG_FILE
 cd $REPO_PATH
 
 git fetch origin
-git reset --hard origin/master
+git reset --hard origin/main
 
 if [ -f "package.json" ]; then
     npm install
@@ -288,7 +288,7 @@ sudo cp -r . /var/www/thirukkural/
 $webhook_url = "http://187.127.165.149:3600/webhook/deploy"
 $secret = "thirukkural-deploy-secret"
 $payload = @{
-    ref = "refs/heads/master"
+    ref = "refs/heads/main"
     after = "b1fffa5"
     head_commit = @{
         message = "Test deployment"
@@ -317,7 +317,7 @@ Invoke-WebRequest -Uri $webhook_url `
 cd C:\Users\JP\Documents\thiru-cur
 git add .
 git commit -m "Test deployment trigger"
-git push origin master
+git push origin main
 
 # Watch the logs on VPS
 ssh root@187.127.165.149
@@ -393,7 +393,7 @@ sudo nginx -t && sudo systemctl reload nginx
 ssh -i ~/.ssh/thirukkural_vps root@187.127.165.149
 
 # Pull latest code
-cd /home/jp-ai-content-studios/thirukkural && git pull origin master
+cd /home/jp-ai-content-studios/thirukkural && git pull origin main
 
 # Check webhook status
 pm2 status

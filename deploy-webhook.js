@@ -119,10 +119,10 @@ app.post('/webhook/deploy', (req, res) => {
   const branch = payload.ref.split('/').pop();
   log(`Push event on branch: ${branch}`);
 
-  // Only deploy on master branch
-  if (branch !== 'master') {
-    log('Skipping deployment: not on master branch');
-    return res.status(200).json({ success: true, message: 'Skipped (not master branch)' });
+  // Only deploy on main branch
+  if (branch !== 'main') {
+    log('Skipping deployment: not on main branch');
+    return res.status(200).json({ success: true, message: 'Skipped (not main branch)' });
   }
 
   try {
@@ -134,7 +134,7 @@ app.post('/webhook/deploy', (req, res) => {
     // Pull latest code
     log('Pulling latest code from GitHub...');
     execSync('git fetch origin', { stdio: 'pipe' });
-    execSync('git reset --hard origin/master', { stdio: 'pipe' });
+    execSync('git reset --hard origin/main', { stdio: 'pipe' });
 
     // Install dependencies if needed
     if (fs.existsSync(path.join(REPO_PATH, 'package.json'))) {

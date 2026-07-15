@@ -6,7 +6,7 @@
 #
 # Services:
 #   web     — nginx serving the static site on :80, proxies webhook -> webhook:3600, studio -> studio:3700
-#   webhook — Node server receiving GitHub push events and deploying on master
+#   webhook — Node server receiving GitHub push events and deploying on main
 #   studio  — Kural Studio API: Gemini image generation + Google Drive storage
 
 services:
