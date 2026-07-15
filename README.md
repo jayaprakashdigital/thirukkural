@@ -33,7 +33,7 @@ The Thirukkural is a classic Tamil Sangam literature work divided into 1,330 cou
 - **Kural Studio** (`kural-detail.html`) — Unified per-kural page pulling the Kural Database, Story Library, Script Page, and Character Library together, with AI-generated (Gemini) character and scene images stored in Google Drive. See `docs/KURAL_STUDIO_SETUP.md`. Currently covers TK-0001–TK-0010 (the same range as the Script Page prototype).
 - **Socials** (`socials.html`) — Social post scheduling.
 - **Admin Dashboard** (`dashboard.html`) — Overview of production status across modules.
-- **Webhook Deployment** (`deploy-webhook.js`) — Auto-deploy on every push to `master`.
+- **Webhook Deployment** (`deploy-webhook.js`) — Auto-deploy on every push to `main`.
 - **Kural Studio API** (`studio-server.js`) — Backend for AI image generation + Google Drive storage.
 - **Docker Stack** — nginx + Node webhook receiver + Kural Studio API via `docker-compose.yml`.
 
@@ -168,7 +168,7 @@ This starts:
 
 ## Deployment
 
-The repo auto-deploys to the VPS on every push to `master` via a GitHub webhook + `deploy-webhook.js`. See:
+The repo auto-deploys to the VPS on every push to `main` via a GitHub webhook + `deploy-webhook.js`. See:
 - `QUICK_SETUP.md` — 15-minute VPS setup.
 - `VPS_DEPLOYMENT_GUIDE.md` — Full deployment walkthrough (SSH, PM2, nginx, firewall, GitHub webhook).
 - `.github/workflows/ci.yml` — CI pipeline (lint, test, validate infra, trigger VPS webhook).

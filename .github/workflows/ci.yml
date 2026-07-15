@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
 
 jobs:
   test:
@@ -47,9 +47,9 @@ jobs:
           fi
 
   deploy:
-    name: Deploy to VPS (master only)
+    name: Deploy to VPS (main only)
     needs: [test, validate-infra]
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,4 +59,4 @@ jobs:
           curl -fsS -X POST "${{ secrets.VPS_DEPLOY_WEBHOOK_URL }}" \
             -H "X-GitHub-Event: push" \
             -H "Content-Type: application/json" \
-            -d '{"ref":"refs/heads/master"}'
+            -d '{"ref":"refs/heads/main"}'
