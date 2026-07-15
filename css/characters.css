@@ -290,6 +290,20 @@
 }
 .char-rel-row label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
 
+/* ===== Card -> character-detail.html link ===== */
+.char-card-profile-link {
+  display: block; padding: 0.6rem 1rem; border-top: 1px solid var(--border);
+  font-size: 0.78rem; font-weight: 600; color: var(--gold-soft); text-decoration: none;
+}
+.char-card-profile-link:hover { background: var(--gold-dim); }
+
+/* ===== Pager ===== */
+.char-pager {
+  display: flex; align-items: center; justify-content: center; gap: 1rem;
+  margin-top: 1.5rem;
+}
+.char-pager-info { font-size: 0.8rem; color: var(--muted); }
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .char-stats-grid { grid-template-columns: repeat(2, 1fr); }

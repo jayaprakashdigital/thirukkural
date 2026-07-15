@@ -1,0 +1,112 @@
+/* Character Detail — per-kural deep profile + 3D reference viewer */
+
+.cd-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.cd-header-badges { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.65rem; flex-wrap: wrap; }
+.cd-header-actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.cd-switcher-btn {
+  padding: 0.5rem 0.9rem; border-radius: 999px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text-secondary); font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+.cd-switcher-btn.active { border-color: var(--border-strong); background: var(--gold-dim); color: var(--gold-soft); }
+
+/* ===== Two-column layout ===== */
+.cd-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+@media (max-width: 900px) {
+  .cd-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== 3D Stage ===== */
+.cd-stage {
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+  aspect-ratio: 3 / 4;
+  perspective: 1000px;
+  cursor: grab;
+}
+.cd-stage:active { cursor: grabbing; }
+
+.cd-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.cd-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  backface-visibility: hidden;
+  background: var(--surface-solid);
+}
+.cd-face svg, .cd-face img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.cd-face-front { transform: rotateY(0deg) translateZ(1px); }
+.cd-face-side { transform: rotateY(90deg) translateZ(1px); }
+.cd-face-back { transform: rotateY(180deg) translateZ(1px); }
+
+.cd-card[data-view="front"] { transform: rotateY(0deg); }
+.cd-card[data-view="side"] { transform: rotateY(-90deg); }
+.cd-card[data-view="back"] { transform: rotateY(-180deg); }
+
+.cd-turnaround { display: flex; gap: 0.5rem; justify-content: center; margin: 1rem 0; }
+.cd-turnaround .ui-btn.active { border-color: var(--border-strong); background: var(--gold-dim); color: var(--gold-soft); }
+
+.cd-viewer-actions { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+
+.cd-ref-inputs { display: flex; flex-direction: column; gap: 0.6rem; padding-top: 0.75rem; border-top: 1px solid var(--border); }
+.cd-ref-inputs .char-field label { font-size: 0.72rem; color: var(--muted); }
+.cd-ref-inputs input {
+  width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--border); border-radius: 0.5rem;
+  background: var(--bg-secondary); color: var(--text-primary); font-size: 0.8rem; font-family: inherit;
+}
+
+/* ===== Deep detail sections ===== */
+.cd-detail-section + .cd-detail-section { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.cd-detail-section h3 { margin: 0 0 0.85rem 0; font-size: 0.95rem; color: var(--gold-soft); font-family: var(--font-display); }
+.cd-detail-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.9rem 1.25rem; }
+.cd-detail-item label { display: block; font-size: 0.7rem; color: var(--muted); margin-bottom: 0.2rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.cd-detail-item span { font-size: 0.88rem; color: var(--text); }
+.cd-detail-item.full { grid-column: 1 / -1; }
+
+.cd-badge-row { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.cd-badge-row .char-tag { cursor: default; }
+
+.cd-prompt-block { position: relative; margin-bottom: 0.85rem; }
+.cd-prompt-block textarea {
+  width: 100%; min-height: 70px; padding: 0.6rem 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem;
+  background: var(--bg-secondary); color: var(--text-secondary); font-size: 0.8rem; font-family: inherit; resize: vertical;
+}
+.cd-prompt-block label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 0.3rem; }
+
+/* ===== Story context reuses .sd-story-text / .sd-kural-box from script-detail.css ===== */
+
+/* ===== Script section ===== */
+.cd-script-scenes { display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.75rem; }
+.cd-script-scene { padding: 0.6rem 0.85rem; border: 1px solid var(--border); border-radius: 0.5rem; font-size: 0.82rem; color: var(--text-secondary); }
+.cd-script-empty { color: var(--muted); font-size: 0.85rem; }
+
+/* ===== Cross-links ===== */
+.cd-crosslinks { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; justify-content: center; }
+
+@media (max-width: 768px) {
+  .cd-detail-grid { grid-template-columns: 1fr; }
+}

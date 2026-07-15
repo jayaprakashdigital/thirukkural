@@ -170,7 +170,9 @@ tr:hover .story-title-cell { color: var(--gold-soft); }
   border: 1px solid var(--border-strong);
   color: var(--gold);
   font-size: 0.8rem; font-weight: 700;
+  text-decoration: none;
 }
+.story-avatar:hover { border-color: var(--gold); }
 
 .modal-place {
   font-size: 0.8rem; color: var(--muted);

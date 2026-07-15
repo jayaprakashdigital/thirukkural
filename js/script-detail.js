@@ -64,6 +64,8 @@ function renderHeader(script) {
   document.getElementById("sd-kural-tamil").textContent = script.thirukkural;
   document.getElementById("sd-kural-en").textContent = "\u201c" + script.englishTranslation + "\u201d";
   document.title = script.kuralId + " \u2014 Script Detail \u2014 AI Content Studio";
+  var viewCharsBtn = document.getElementById("view-characters-btn");
+  if (viewCharsBtn) viewCharsBtn.href = "character-detail.html?kural=" + script.kuralNumber;
 }
 
 /* ===== SCENE TIMELINE ===== */
