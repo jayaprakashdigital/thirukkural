@@ -6,6 +6,16 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["http-server", "-p", "3000", "--cors"],
       "port": 3000
+    },
+    {
+      "name": "VPS SSH Connection",
+      "type": "ssh",
+      "host": "187.127.165.149",
+      "port": 22,
+      "username": "root",
+      "privateKeyPath": "~/.ssh/thirukkural_vps",
+      "remoteWorkspace": "/home/jp-ai-content-studios/thirukkural",
+      "description": "Remote development on Thirukkural VPS via SSH"
     }
   ]
 }
