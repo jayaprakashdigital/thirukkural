@@ -201,7 +201,12 @@ function initLibrary() {
     const card = e.target.closest(".library-item");
     if (!card) return;
     const item = ALL_ITEMS.find((i) => i.n === parseInt(card.dataset.n, 10));
-    if (item) showToast(item.id + " — " + item.chEn + " (" + item.status + ")");
+    if (!item) return;
+    if (kuralStudioAvailable(item.n)) {
+      openKuralStudio(item.n);
+    } else {
+      showToast(item.id + " — " + item.chEn + " (" + item.status + ") — Kural Studio not available for this kural yet");
+    }
   });
 
   document.getElementById("generate-btn")?.addEventListener("click", () => {

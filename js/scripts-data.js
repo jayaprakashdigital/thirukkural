@@ -9,6 +9,19 @@
  * persisted to localStorage so the prototype survives a page reload.
  */
 
+// In the browser, autoGenCharacterPrompt/autoGenBackgroundPrompt/autoGenLightingPrompt/
+// autoGenMusicPrompt come from js/shared-prompts.js loaded earlier via <script> (classic
+// scripts share one global scope). In Node (studio-server.js requiring this file directly),
+// there's no shared scope, so pull them in explicitly.
+if (typeof require !== "undefined" && typeof module !== "undefined") {
+  var __sharedPrompts = require("./shared-prompts.js");
+  var STUDIO_STYLE = __sharedPrompts.STUDIO_STYLE;
+  var autoGenCharacterPrompt = __sharedPrompts.autoGenCharacterPrompt;
+  var autoGenBackgroundPrompt = __sharedPrompts.autoGenBackgroundPrompt;
+  var autoGenLightingPrompt = __sharedPrompts.autoGenLightingPrompt;
+  var autoGenMusicPrompt = __sharedPrompts.autoGenMusicPrompt;
+}
+
 // ===== MVP SCOPE =====
 const MVP_KURAL_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -570,8 +583,9 @@ function updateScene(kuralNumber, sceneNumber, updatedFields) {
 // Export for use
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
-    MVP_KURAL_NUMBERS, LOCATION_OPTIONS, EMOTION_OPTIONS, CAMERA_OPTIONS,
+    MVP_KURAL_NUMBERS, SCRIPT_SOURCE_STORIES, LOCATION_OPTIONS, EMOTION_OPTIONS, CAMERA_OPTIONS,
     TRANSITION_OPTIONS, MUSIC_OPTIONS, SFX_OPTIONS,
+    buildScriptFromStory,
     getScript, saveScript, getAllScripts, calcTotalDuration, formatDuration,
     addScene, deleteScene, reorderScene, updateScene
   };

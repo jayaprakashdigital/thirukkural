@@ -1,11 +1,13 @@
 # Thirukkural — local / VPS stack via Docker Compose.
 # Usage:
-#   1. cp .env.example .env  &&  fill in WEBHOOK_SECRET
+#   1. cp .env.example .env  &&  fill in WEBHOOK_SECRET (and the Kural Studio
+#      vars — see docs/KURAL_STUDIO_SETUP.md — if you want image generation)
 #   2. docker compose up -d --build
 #
 # Services:
-#   web     — nginx serving the static site on :80, proxies webhook -> webhook:3600
+#   web     — nginx serving the static site on :80, proxies webhook -> webhook:3600, studio -> studio:3700
 #   webhook — Node server receiving GitHub push events and deploying on master
+#   studio  — Kural Studio API: Gemini image generation + Google Drive storage
 
 services:
   web:
@@ -20,6 +22,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - webhook
+      - studio
     restart: unless-stopped
 
   webhook:
@@ -37,3 +40,31 @@ services:
       # Read-write mount so the webhook can `git fetch` / `git reset --hard`.
       - ./:/repo
     restart: unless-stopped
+
+  studio:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thirukkural-studio
+    command: ["node", "studio-server.js"]
+    environment:
+      # All required — see docs/KURAL_STUDIO_SETUP.md for how to obtain each one.
+      - GEMINI_API_KEY=${GEMINI_API_KEY:?GEMINI_API_KEY must be set in .env}
+      - GEMINI_IMAGE_MODEL=${GEMINI_IMAGE_MODEL:-gemini-2.5-flash-image}
+      - GOOGLE_OAUTH_CLIENT_ID=${GOOGLE_OAUTH_CLIENT_ID:?GOOGLE_OAUTH_CLIENT_ID must be set in .env}
+      - GOOGLE_OAUTH_CLIENT_SECRET=${GOOGLE_OAUTH_CLIENT_SECRET:?GOOGLE_OAUTH_CLIENT_SECRET must be set in .env}
+      - GOOGLE_OAUTH_REFRESH_TOKEN=${GOOGLE_OAUTH_REFRESH_TOKEN:?GOOGLE_OAUTH_REFRESH_TOKEN must be set in .env}
+      - GOOGLE_DRIVE_FOLDER_ID=${GOOGLE_DRIVE_FOLDER_ID:?GOOGLE_DRIVE_FOLDER_ID must be set in .env}
+      - PORT=3700
+      - REPO_PATH=/repo
+      - STUDIO_INDEX_PATH=/data/studio-index.json
+      - LOG_FILE=/var/log/thirukkural-studio.log
+    volumes:
+      # Read-only — studio only reads kural/story/character/script data, never writes to the repo.
+      - ./:/repo:ro
+      # Named volume so the generation-state index survives `git reset --hard` deploys and rebuilds.
+      - studio-state:/data
+    restart: unless-stopped
+
+volumes:
+  studio-state:

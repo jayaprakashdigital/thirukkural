@@ -809,6 +809,7 @@ function openModal(n) {
     <div class="modal-box" role="dialog" aria-modal="true" aria-label="${esc(s.title)}">
       <div class="modal-header">
         <span class="story-id-badge">${esc(kuralId(n))}</span>
+        ${kuralStudioAvailable(n) ? `<button type="button" class="ui-btn" id="modal-open-studio">Open in Kural Studio</button>` : ""}
         <button type="button" class="modal-close" data-close aria-label="Close">${ICONS.close}</button>
       </div>
       <p class="modal-story-title">${esc(s.title)}</p>
@@ -845,6 +846,7 @@ function openModal(n) {
   modal.querySelectorAll("[data-close]").forEach((el) =>
     el.addEventListener("click", closeModal)
   );
+  document.getElementById("modal-open-studio")?.addEventListener("click", () => openKuralStudio(n));
 }
 
 function closeModal() {

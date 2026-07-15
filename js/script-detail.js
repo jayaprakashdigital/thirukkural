@@ -51,6 +51,7 @@ function characterOptionsFor(script) {
 function renderHeader(script) {
   document.getElementById("breadcrumb-kural").textContent = script.kuralId;
   document.getElementById("sd-kural-id").textContent = script.kuralId;
+  document.getElementById("sd-open-studio").href = "kural-detail.html?id=" + script.kuralId;
   document.getElementById("sd-theme").textContent = script.theme;
   document.getElementById("sd-title").textContent = script.title;
   document.getElementById("sd-scene-count").textContent = script.scenes.length;
