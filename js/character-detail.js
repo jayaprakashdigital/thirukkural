@@ -267,8 +267,10 @@ function initCharacterDetail() {
   currentKuralNumber = params.kuralNumber;
   currentCharIndex = params.charIndex;
 
-  initSidebar();
-  initTheme();
+  // Theme/sidebar init is handled once by dashboard.js's own DOMContentLoaded
+  // listener (loaded on this page too) — calling initTheme()/initSidebar()
+  // again here double-attaches the #theme-toggle click listener and makes
+  // the toggle button appear to do nothing.
   renderAll();
   wireTurnaround();
   wireTilt();

@@ -559,23 +559,10 @@ function initCharacterLibrary() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  if (typeof THEME_KEY !== "undefined" || typeof THEME_KEY === "string") {
-    // THEME_KEY from dashboard.js
-  }
-  // Theme & sidebar init from shared infrastructure
-  if (typeof applyTheme === "function") applyTheme(localStorage.getItem("thirukkural-theme") || "dark");
-  document.getElementById("theme-toggle")?.addEventListener("click", function () {
-    var t = (localStorage.getItem("thirukkural-theme") || "dark") === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", t);
-    localStorage.setItem("thirukkural-theme", t);
-    location.reload();
-  });
-
-  var sb = document.getElementById("sidebar");
-  var ov = document.getElementById("sidebar-overlay");
-  document.getElementById("sidebar-open")?.addEventListener("click", function () { sb.classList.add("open"); ov?.classList.add("visible"); });
-  document.getElementById("sidebar-close")?.addEventListener("click", function () { sb.classList.remove("open"); ov?.classList.remove("visible"); });
-  ov?.addEventListener("click", function () { sb.classList.remove("open"); ov.classList.remove("visible"); });
-
+  // Theme and sidebar init are handled once by dashboard.js's own
+  // DOMContentLoaded listener (loaded on this page too) — this used to
+  // reimplement both here, which double-attached the #theme-toggle click
+  // listener (and reloaded the page) and made the toggle button appear
+  // to revert itself on every click.
   initCharacterLibrary();
 });
