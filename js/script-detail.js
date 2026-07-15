@@ -138,22 +138,26 @@ function renderHeader(script) {
 /* ===== SCENE TIMELINE ===== */
 function sceneCardHTML(scene, index, total) {
   var characterTags = (scene.characters || []).map(function (c) { return '<span class="scene-tag">' + c + '</span>'; }).join("");
-  return '<div class="scene-card" data-scene="' + scene.sceneNumber + '">'
-    + '<div class="scene-card-header"><span class="scene-number">' + scene.sceneNumber + '</span>'
-    + '<div class="scene-card-reorder">'
+  return '<div class="scene-row" data-scene="' + scene.sceneNumber + '">'
+    + '<div class="scene-row-rail"><span class="scene-number">' + scene.sceneNumber + '</span>'
+    + (index < total - 1 ? '<div class="scene-row-line"></div>' : '')
+    + '</div>'
+    + '<div class="scene-row-card">'
+    + '<div class="scene-row-card-top" data-action="edit" data-scene="' + scene.sceneNumber + '">'
+    + '<h3 class="scene-title">' + (scene.title || "Untitled Scene") + '</h3>'
+    + '<div class="scene-row-reorder">'
     + '<button type="button" class="scene-reorder-btn" data-action="up" data-scene="' + scene.sceneNumber + '"' + (index === 0 ? ' disabled' : '') + ' aria-label="Move scene earlier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>'
     + '<button type="button" class="scene-reorder-btn" data-action="down" data-scene="' + scene.sceneNumber + '"' + (index === total - 1 ? ' disabled' : '') + ' aria-label="Move scene later"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg></button>'
     + '</div></div>'
-    + '<div class="scene-card-body" data-action="edit" data-scene="' + scene.sceneNumber + '">'
-    + '<h3 class="scene-title">' + (scene.title || "Untitled Scene") + '</h3>'
+    + '<div class="scene-row-body" data-action="edit" data-scene="' + scene.sceneNumber + '">'
     + '<div class="scene-meta"><span class="scene-tag">' + scene.duration + 's</span><span class="scene-tag">' + (scene.location || "") + '</span><span class="scene-tag">' + (scene.status || "Draft") + '</span></div>'
     + '<div class="scene-meta">' + characterTags + '</div>'
     + '<p class="scene-narration-preview">' + (scene.narration || "No narration yet.") + '</p>'
     + '</div>'
-    + '<div class="scene-card-footer">'
+    + '<div class="scene-row-footer">'
     + '<button type="button" class="ui-btn" data-action="edit" data-scene="' + scene.sceneNumber + '">Edit</button>'
     + '<button type="button" class="ui-btn" data-action="delete" data-scene="' + scene.sceneNumber + '">Delete</button>'
-    + '</div></div>';
+    + '</div></div></div>';
 }
 
 function renderTimeline(script) {
@@ -162,9 +166,8 @@ function renderTimeline(script) {
   var html = "";
   script.scenes.forEach(function (scene, i) {
     html += sceneCardHTML(scene, i, total);
-    html += '<div class="scene-timeline-connector"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>';
   });
-  html += '<button type="button" class="scene-add-card" id="timeline-add-scene"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Scene</button>';
+  html += '<button type="button" class="scene-add-row" id="timeline-add-scene"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Add Scene</button>';
   container.innerHTML = html;
 
   container.querySelectorAll('[data-action="edit"]').forEach(function (el) {

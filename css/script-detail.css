@@ -79,65 +79,84 @@
 }
 
 /* ===== Scene Timeline ===== */
+/* Vertical stacked timeline: rail (number + connecting line) on the left,
+   full-width card on the right. Reads top-to-bottom like a storyboard —
+   no horizontal scrolling, no clamped text. */
 .scene-timeline {
   display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding-bottom: 0.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
+  flex-direction: column;
 }
 
-.scene-card {
-  flex: 0 0 260px;
+.scene-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.scene-row-rail {
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  transition: border-color 0.2s, transform 0.2s;
-}
-
-.scene-card:hover {
-  border-color: var(--border-strong);
-  transform: translateY(-2px);
-}
-
-.scene-card-header {
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: var(--gold-dim);
-  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .scene-number {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--gold);
   color: #1c1917;
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 700;
   flex-shrink: 0;
 }
 
-.scene-card-reorder {
+.scene-row-line {
+  width: 2px;
+  flex: 1;
+  min-height: 1.25rem;
+  margin: 0.35rem 0;
+  background: var(--border-strong);
+}
+
+.scene-row-card {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.scene-row-card:hover {
+  border-color: var(--border-strong);
+}
+
+.scene-row-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem 0.5rem;
+  cursor: pointer;
+}
+
+.scene-row-reorder {
   display: flex;
   gap: 0.15rem;
+  flex-shrink: 0;
 }
 
 .scene-reorder-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: none;
   background: transparent;
@@ -150,18 +169,17 @@
 .scene-reorder-btn:disabled { opacity: 0.25; cursor: not-allowed; }
 .scene-reorder-btn svg { width: 14px; height: 14px; }
 
-.scene-card-body {
-  padding: 0.9rem 1rem;
-  flex: 1;
+.scene-row-body {
+  padding: 0 1.1rem 0.9rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
   cursor: pointer;
 }
 
 .scene-title {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text);
 }
@@ -170,11 +188,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  font-size: 0.72rem;
+  font-size: 0.75rem;
 }
 
 .scene-tag {
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border);
@@ -183,33 +201,30 @@
 
 .scene-narration-preview {
   margin: 0;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--muted);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-height: 1.6;
 }
 
-.scene-card-footer {
+.scene-row-footer {
   display: flex;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1.1rem;
   border-top: 1px solid var(--border);
 }
 
-.scene-card-footer .ui-btn {
-  flex: 1;
-  padding: 0.45rem 0.6rem;
+.scene-row-footer .ui-btn {
+  padding: 0.45rem 0.9rem;
   font-size: 0.78rem;
 }
 
-.scene-add-card {
-  flex: 0 0 160px;
+.scene-add-row {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
+  padding: 0.9rem;
+  margin-left: 3rem;
   border-radius: var(--radius-sm);
   border: 1px dashed var(--border-strong);
   color: var(--gold-soft);
@@ -217,22 +232,11 @@
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
-  gap: 0.4rem;
-  min-height: 200px;
   transition: background 0.2s;
 }
 
-.scene-add-card:hover { background: var(--gold-dim); }
-.scene-add-card svg { width: 20px; height: 20px; }
-
-.scene-timeline-connector {
-  display: flex;
-  align-items: center;
-  color: var(--muted);
-  flex-shrink: 0;
-}
-
-.scene-timeline-connector svg { width: 18px; height: 18px; }
+.scene-add-row:hover { background: var(--gold-dim); }
+.scene-add-row svg { width: 20px; height: 20px; }
 
 /* ===== Scene Editor Modal ===== */
 .scene-editor-content {
@@ -616,7 +620,9 @@
   .sd-header-top { flex-direction: column; }
   .sd-header-actions { width: 100%; }
   .sd-header-actions .ui-btn { flex: 1; min-width: 0; }
-  .scene-card { flex: 0 0 220px; }
+  .scene-row { gap: 0.6rem; }
+  .scene-number { width: 28px; height: 28px; font-size: 0.78rem; }
+  .scene-add-row { margin-left: 0; }
   .sf-dialogue-row { grid-template-columns: 1fr; }
   .sf-grid { grid-template-columns: 1fr; }
   .sf-tabs { gap: 0.2rem; }
