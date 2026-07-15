@@ -765,31 +765,7 @@ function saveScene(silent) {
   }
 }
 
-/* ===== SESSION 02: PRODUCTION DASHBOARD ===== */
-function renderProductionDashboard(script) {
-  var grid = document.getElementById("sd-prod-grid");
-  if (!grid) return;
-  var scenes = script.scenes || [];
-  var draft = scenes.filter(function (s) { return (s.status || "Draft") === "Draft"; }).length;
-  var ready = scenes.filter(function (s) { return s.status === "Ready"; }).length;
-  var finalS = scenes.filter(function (s) { return s.status === "Final"; }).length;
-  var withPrompts = scenes.filter(function (s) { return s.masterImagePrompt && s.masterVideoPrompt; }).length;
-  var readiness = scenes.length ? Math.round((withPrompts / scenes.length) * 100) : 0;
-
-  function statCard(val, label, pct) {
-    var bar = (pct !== undefined) ? '<div class="sd-prod-progress-bar"><div class="sd-prod-progress-fill" style="width:' + pct + '%"></div></div>' : "";
-    return '<div class="sd-prod-stat"><span class="sd-prod-stat-value">' + val + '</span><span class="sd-prod-stat-label">' + label + "</span>" + bar + "</div>";
-  }
-  grid.innerHTML =
-    statCard(scenes.length, "Total Scenes") +
-    statCard(formatDuration(calcTotalDuration(script)), "Total Duration") +
-    statCard(draft, "Draft Scenes") +
-    statCard(ready, "Ready Scenes") +
-    statCard(finalS, "Final Scenes") +
-    statCard(readiness + "%", "AI Readiness", readiness);
-}
-
-/* ===== SESSIONS 15+16: SCRIPT VALIDATION ===== */
+/* ===== PER-SCENE VALIDATION SCORE (used by scene editor strip) ===== */
 function sceneValidationScore(scene) {
   var fields = ["narration", "title", "masterImagePrompt", "masterVideoPrompt", "backgroundMusic", "cameraAngle", "location", "emotion"];
   var present = 0;
@@ -801,79 +777,7 @@ function sceneValidationScore(scene) {
   return Math.round((present / (fields.length + 2)) * 100);
 }
 
-function renderValidation(script) {
-  var summaryEl = document.getElementById("sd-validation-summary");
-  var scenesEl = document.getElementById("sd-validation-scenes");
-  if (!summaryEl || !scenesEl) return;
-  var scenes = script.scenes || [];
-  var scores = scenes.map(sceneValidationScore);
-  var avg = scores.length ? Math.round(scores.reduce(function (a, b) { return a + b; }, 0) / scores.length) : 0;
-  var deg = Math.round(avg * 3.6);
-  var missingPrompts = scenes.filter(function (s) { return !s.masterImagePrompt || !s.masterVideoPrompt; }).length;
-  var missingAudio = scenes.filter(function (s) { return !s.backgroundMusic; }).length;
-  var missingCamera = scenes.filter(function (s) { return !s.cameraAngle; }).length;
-  var readyScenes = scores.filter(function (s) { return s >= 100; }).length;
-  var allFinal = scenes.length > 0 && scenes.every(function (s) { return s.status === "Final"; });
-
-  summaryEl.innerHTML =
-    '<div class="sd-validation-score"><div class="sd-validation-score-ring" style="background: conic-gradient(var(--gold) ' + deg + 'deg, rgba(255,255,255,0.06) 0deg)"><span>' + avg + '%</span></div><div class="sd-validation-score-label">AI Readiness<small>' + (readyScenes + " of " + scenes.length + " scenes ready") + "</small></div></div>" +
-    '<div class="sd-validation-issues">' +
-    '<span class="sd-validation-issue ok">' + readyScenes + " ready</span>" +
-    '<span class="sd-validation-issue ' + (missingPrompts ? "err" : "ok") + '">' + missingPrompts + " missing prompts</span>" +
-    '<span class="sd-validation-issue ' + (missingAudio ? "warn" : "ok") + '">' + missingAudio + " missing audio</span>" +
-    '<span class="sd-validation-issue ' + (missingCamera ? "warn" : "ok") + '">' + missingCamera + " missing camera</span>" +
-    "</div>" +
-    '<div class="sd-publish-status"><span class="sd-status-dot"></span>' + (allFinal ? "Ready for Publishing" : (scenes.length - finalCount(scenes)) + " scenes need finalizing") + "</div>";
-
-  scenesEl.innerHTML = scenes.map(function (scene, i) {
-    var score = scores[i];
-    var missing = [];
-    ["narration", "masterImagePrompt", "masterVideoPrompt", "backgroundMusic", "cameraAngle", "emotion"].forEach(function (f) {
-      if (!scene[f] || !String(scene[f]).trim()) missing.push(f.replace(/([A-Z])/g, " $1").replace(/^./, function (c) { return c.toUpperCase(); }));
-    });
-    if (!scene.characters || !scene.characters.length) missing.push("Characters");
-    if (!scene.dialogue || !scene.dialogue.length) missing.push("Dialogue");
-    return '<div class="sd-validation-row"><span class="sd-validation-row-num">' + scene.sceneNumber + '</span><span class="sd-validation-row-title">' + esc(scene.title) + "</span>" +
-      '<span class="sd-validation-row-missing">' + (missing.length ? "Missing: " + missing.join(", ") : "All fields complete") + "</span>" +
-      '<span class="sd-validation-row-pct">' + score + "%</span></div>";
-  }).join("");
-}
-
-function finalCount(scenes) {
-  return scenes.filter(function (s) { return s.status === "Final"; }).length;
-}
-
-/* ===== SESSION 18: AI WORKFLOW ===== */
-function renderWorkflow(script) {
-  var track = document.getElementById("sd-workflow-track");
-  if (!track) return;
-  var scenes = script.scenes || [];
-  var allHave = function (field) { return scenes.length > 0 && scenes.every(function (s) { return s[field] && String(s[field]).trim(); }); };
-  var someHave = function (field) { return scenes.some(function (s) { return s[field] && String(s[field]).trim(); }); };
-  var status = computeScriptStatus(script);
-
-  var steps = [
-    { icon: "\uD83D\uDCD6", label: "Story", count: "1", done: !!script.storyPreview },
-    { icon: "\uD83C\uDFAC", label: "Scenes", count: scenes.length, done: scenes.length > 0 },
-    { icon: "\u270F\uFE0F", label: "Prompts", count: scenes.filter(function (s) { return s.masterImagePrompt; }).length + "/" + scenes.length, done: allHave("masterImagePrompt") && allHave("masterVideoPrompt"), active: someHave("masterImagePrompt") },
-    { icon: "\uD83D\uDDBC", label: "Image", count: "0/" + scenes.length, done: false, active: someHave("imagePrompt") },
-    { icon: "\uD83C\uDFAC", label: "Video", count: scenes.filter(function (s) { return s.videoPrompt || s.masterVideoPrompt; }).length + "/" + scenes.length, done: false, active: someHave("masterVideoPrompt") },
-    { icon: "\uD83C\uDF99", label: "Voice", count: scenes.filter(function (s) { return s.narrationVoice; }).length + "/" + scenes.length, done: scenes.length > 0 && scenes.every(function (s) { return s.narrationVoice; }), active: someHave("narrationVoice") },
-    { icon: "\uD83D\uDCC1", label: "Assets", count: "0/" + scenes.length, done: false, active: false },
-    { icon: "\uD83D\uDE80", label: "Publishing", count: status, done: status === "Complete", active: status === "In Progress" }
-  ];
-
-  var arrow = '<div class="sd-workflow-step-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>';
-  var html = "";
-  steps.forEach(function (step, i) {
-    var cls = step.done ? " done" : (step.active ? " active" : "");
-    html += '<div class="sd-workflow-step' + cls + '"><div class="sd-workflow-step-icon">' + step.icon + '</div><div class="sd-workflow-step-label">' + step.label + '</div><div class="sd-workflow-step-count">' + step.count + '</div></div>';
-    if (i < steps.length - 1) html += arrow;
-  });
-  track.innerHTML = html;
-}
-
-/* ===== SESSION 17: EXPORT CENTER ===== */
+/* ===== EXPORT CENTER ===== */
 function downloadFile(filename, content, mime) {
   var blob = new Blob([content], { type: mime || "text/plain" });
   var url = URL.createObjectURL(blob);
@@ -886,32 +790,63 @@ function downloadFile(filename, content, mime) {
   setTimeout(function () { URL.revokeObjectURL(url); }, 100);
 }
 
+function buildExportJSON(script) {
+  return JSON.stringify(script, null, 2);
+}
+
+function buildExportMarkdown(script) {
+  var md = "# " + script.title + "\n\n## Story Preview\n" + script.storyPreview + "\n\n";
+  md += "## Thirukkural\n" + script.thirukkural + "\n\n*" + script.englishTranslation + "*\n\n## Scenes\n";
+  script.scenes.forEach(function (s) {
+    md += "\n### Scene " + s.sceneNumber + " — " + (s.title || "") + "\n- **Duration:** " + s.duration + "s\n- **Location:** " + (s.location || "") + "\n- **Emotion:** " + (s.emotion || "") + "\n- **Camera:** " + (s.cameraAngle || s.camera || "") + "\n- **Narration:** " + (s.narration || "") + "\n- **Image Prompt:** " + (s.masterImagePrompt || s.imagePrompt || "") + "\n- **Video Prompt:** " + (s.masterVideoPrompt || s.videoPrompt || "") + "\n";
+  });
+  return md;
+}
+
+function buildExportScript(script) {
+  var txt = "SCRIPT: " + script.title + "\n" + script.kuralId + "\n" + "=".repeat(60) + "\n\n";
+  script.scenes.forEach(function (s) {
+    txt += "SCENE " + s.sceneNumber + " — " + (s.title || "") + "\nDuration: " + s.duration + "s | Location: " + (s.location || "") + " | Camera: " + (s.cameraAngle || s.camera || "") + "\n\n";
+    if (s.narration) txt += "NARRATION: " + s.narration + "\n\n";
+    (s.dialogue || []).forEach(function (d) { if (d.character && d.line) txt += d.character.toUpperCase() + ": " + d.line + "\n"; });
+    txt += "\n" + "-".repeat(40) + "\n\n";
+  });
+  return txt;
+}
+
+var activeExportTab = "json";
+
+function renderExportPreview(script) {
+  var preview = document.getElementById("sd-export-preview");
+  if (!preview) return;
+  var content = activeExportTab === "md" ? buildExportMarkdown(script)
+    : activeExportTab === "script" ? buildExportScript(script)
+    : buildExportJSON(script);
+  preview.textContent = content;
+}
+
+function switchExportTab(tabId) {
+  activeExportTab = tabId;
+  document.querySelectorAll(".sd-export-tab").forEach(function (t) {
+    t.classList.toggle("active", t.getAttribute("data-export-tab") === tabId);
+  });
+  renderExportPreview(getScript(currentKuralNumber));
+}
+
 function handleExport(type) {
   var script = getScript(currentKuralNumber);
   var kid = script.kuralId || "TK-0000";
   if (type === "json") {
-    downloadFile("script-" + kid + ".json", JSON.stringify(script, null, 2), "application/json");
+    downloadFile("script-" + kid + ".json", buildExportJSON(script), "application/json");
     showToast("JSON exported");
   } else if (type === "md") {
-    var md = "# " + script.title + "\n\n## Story Preview\n" + script.storyPreview + "\n\n";
-    md += "## Thirukkural\n" + script.thirukkural + "\n\n*" + script.englishTranslation + "*\n\n## Scenes\n";
-    script.scenes.forEach(function (s) {
-      md += "\n### Scene " + s.sceneNumber + " — " + (s.title || "") + "\n- **Duration:** " + s.duration + "s\n- **Location:** " + (s.location || "") + "\n- **Emotion:** " + (s.emotion || "") + "\n- **Camera:** " + (s.cameraAngle || s.camera || "") + "\n- **Narration:** " + (s.narration || "") + "\n- **Image Prompt:** " + (s.masterImagePrompt || s.imagePrompt || "") + "\n- **Video Prompt:** " + (s.masterVideoPrompt || s.videoPrompt || "") + "\n";
-    });
-    downloadFile("script-" + kid + ".md", md, "text/markdown");
+    downloadFile("script-" + kid + ".md", buildExportMarkdown(script), "text/markdown");
     showToast("Markdown exported");
   } else if (type === "script") {
-    var txt = "SCRIPT: " + script.title + "\n" + script.kuralId + "\n" + "=".repeat(60) + "\n\n";
-    script.scenes.forEach(function (s) {
-      txt += "SCENE " + s.sceneNumber + " — " + (s.title || "") + "\nDuration: " + s.duration + "s | Location: " + (s.location || "") + " | Camera: " + (s.cameraAngle || s.camera || "") + "\n\n";
-      if (s.narration) txt += "NARRATION: " + s.narration + "\n\n";
-      (s.dialogue || []).forEach(function (d) { if (d.character && d.line) txt += d.character.toUpperCase() + ": " + d.line + "\n"; });
-      txt += "\n" + "-".repeat(40) + "\n\n";
-    });
-    downloadFile("script-" + kid + ".txt", txt, "text/plain");
+    downloadFile("script-" + kid + ".txt", buildExportScript(script), "text/plain");
     showToast("Script exported");
   } else if (type === "copy") {
-    navigator.clipboard.writeText(JSON.stringify(script, null, 2));
+    navigator.clipboard.writeText(buildExportJSON(script));
     showToast("JSON copied to clipboard");
   }
 }
@@ -945,9 +880,7 @@ function refreshPage() {
   var script = getScript(currentKuralNumber);
   renderHeader(script);
   renderTimeline(script);
-  renderProductionDashboard(script);
-  renderValidation(script);
-  renderWorkflow(script);
+  renderExportPreview(script);
 }
 
 function initScriptDetail() {
@@ -978,6 +911,10 @@ function initScriptDetail() {
   document.getElementById("export-md-btn")?.addEventListener("click", function () { handleExport("md"); });
   document.getElementById("export-script-btn")?.addEventListener("click", function () { handleExport("script"); });
   document.getElementById("copy-json-btn")?.addEventListener("click", function () { handleExport("copy"); });
+
+  document.querySelectorAll(".sd-export-tab").forEach(function (tab) {
+    tab.addEventListener("click", function () { switchExportTab(tab.getAttribute("data-export-tab")); });
+  });
 
   var editorModal = document.getElementById("scene-editor-modal");
   document.addEventListener("keydown", function (e) {
