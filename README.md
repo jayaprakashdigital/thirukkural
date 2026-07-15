@@ -30,10 +30,12 @@ The Thirukkural is a classic Tamil Sangam literature work divided into 1,330 cou
 - **Prompts** (`prompts.html`) — AI prompt library for image/video generation.
 - **Script Detail** (`script-detail.html`) — Scene-based script editor per kural.
 - **Media Libraries** (`images.html`, `videos.html`) — Image and video library tracking.
+- **Kural Studio** (`kural-detail.html`) — Unified per-kural page pulling the Kural Database, Story Library, Script Page, and Character Library together, with AI-generated (Gemini) character and scene images stored in Google Drive. See `docs/KURAL_STUDIO_SETUP.md`. Currently covers TK-0001–TK-0010 (the same range as the Script Page prototype).
 - **Socials** (`socials.html`) — Social post scheduling.
 - **Admin Dashboard** (`dashboard.html`) — Overview of production status across modules.
 - **Webhook Deployment** (`deploy-webhook.js`) — Auto-deploy on every push to `master`.
-- **Docker Stack** — nginx + Node webhook receiver via `docker-compose.yml`.
+- **Kural Studio API** (`studio-server.js`) — Backend for AI image generation + Google Drive storage.
+- **Docker Stack** — nginx + Node webhook receiver + Kural Studio API via `docker-compose.yml`.
 
 ## Tech Stack
 
@@ -61,29 +63,36 @@ thirukkural/
 ├── script-detail.html      # Scene-based script editor
 ├── images.html             # Image library
 ├── videos.html             # Video library
+├── kural-detail.html       # Kural Studio — unified per-kural page + AI images
 ├── socials.html            # Social posts
 ├── css/                    # Per-page + shared stylesheets
 ├── js/                     # Page scripts + data modules
 │   ├── shared.js           # Theme, toast, sidebar helpers (DRY)
+│   ├── shared-prompts.js   # AI prompt templates (used by browser AND studio-server.js)
 │   ├── nav.js              # Navigation bootstrap
 │   ├── kurals.js           # Kural DB logic
 │   ├── dashboard.js        # Dashboard logic
 │   ├── stories.js          # Stories data + render
 │   ├── characters*.js      # Character library
 │   ├── prompts*.js         # Prompt library
+│   ├── scripts-data.js     # Script/scene data (TK-0001–TK-0010), also required by studio-server.js
 │   ├── script-detail.js    # Scene editor
+│   ├── kural-detail.js     # Kural Studio page logic
 │   ├── socials.js          # Social posts
 │   └── media-data.js       # Shared media metadata
+├── server/                 # Kural Studio backend modules (pure logic + Gemini/Drive clients)
+├── test/                   # node --test unit/integration tests
 ├── thirukkural.json        # All 1330 kurals (primary dataset)
 ├── detail.json             # Chapter/group/section metadata
 ├── all_stories_final.json  # Story adaptations
 ├── deploy-webhook.js       # GitHub webhook receiver
-├── Dockerfile              # Webhook image
-├── docker-compose.yml      # web (nginx) + webhook stack
-├── nginx.conf              # Site + webhook reverse-proxy config
+├── studio-server.js        # Kural Studio API (AI image generation + Drive storage)
+├── Dockerfile              # Shared webhook/studio image
+├── docker-compose.yml      # web (nginx) + webhook + studio stack
+├── nginx.conf              # Site + webhook + studio reverse-proxy config
 ├── start-server.bat        # Windows local dev server
 ├── .github/workflows/ci.yml# Lint, test, validate, deploy
-└── docs/                   # Architecture, project, standards
+└── docs/                   # Architecture, project, standards, docs/KURAL_STUDIO_SETUP.md
 ```
 
 ## Getting Started
@@ -144,8 +153,10 @@ This starts:
 | `/script-detail.html`                 | Script scene editor   |
 | `/images.html`                        | Image library         |
 | `/videos.html`                        | Video library         |
+| `/kural-detail.html?id=TK-0001`       | Kural Studio (unified page + AI images) |
 | `/socials.html`                       | Social posts          |
 | `http://<host>:3600/health`           | Webhook health check  |
+| `/studio/health` (or `:3700/health`)  | Kural Studio API health check |
 
 **Theme toggle** is available in the navbar; the preference is stored under the `thirukkural-theme` localStorage key (see `js/shared.js`).
 

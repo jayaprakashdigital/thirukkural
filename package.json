@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "node --test",
-    "start:webhook": "node deploy-webhook.js"
+    "start:webhook": "node deploy-webhook.js",
+    "start:studio": "node studio-server.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   "homepage": "https://github.com/tk120404/thirukkural#readme",
   "dependencies": {
     "express": "^4.18.2",
+    "googleapis": "^144.0.0",
     "jsdom": "^29.1.1"
   }
 }

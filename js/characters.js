@@ -316,6 +316,7 @@ function renderDrawerContent(c) {
     '<button type="button" class="ui-btn" id="d-delete">Delete</button>' +
     '<button type="button" class="ui-btn" id="d-export">Export JSON</button>' +
     '<button type="button" class="ui-btn" id="d-copy-prompt">Copy AI Prompt</button>' +
+    (kuralStudioAvailable(c.kuralNumber) ? '<button type="button" class="ui-btn" id="d-open-studio">Open in Kural Studio</button>' : "") +
     '</div>';
 }
 
@@ -359,6 +360,10 @@ function wireDrawerEvents() {
   document.getElementById("d-delete")?.addEventListener("click", deleteChar);
   document.getElementById("d-export")?.addEventListener("click", exportSingleChar);
   document.getElementById("d-copy-prompt")?.addEventListener("click", copyAIPrompt);
+  document.getElementById("d-open-studio")?.addEventListener("click", function () {
+    var c = getCharById(editingCharId);
+    if (c) openKuralStudio(c.kuralNumber);
+  });
 }
 
 function readDrawer() {

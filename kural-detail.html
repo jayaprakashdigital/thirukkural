@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kural Studio — AI Content Studio</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css?v=2">
+  <link rel="stylesheet" href="css/components.css?v=4">
+  <link rel="stylesheet" href="css/dashboard.css?v=4">
+  <link rel="stylesheet" href="css/script-detail.css?v=6">
+  <link rel="stylesheet" href="css/kural-detail.css?v=1">
+  <script>
+    (function () {
+      var t = localStorage.getItem("thirukkural-theme") || "dark";
+      document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
+</head>
+<body class="dashboard-body">
+  <div class="bg-scene" aria-hidden="true"></div>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="dashboard.html" class="sidebar-brand">
+          <span class="sidebar-brand-icon">AI</span>
+          <span class="sidebar-brand-text">
+            <strong>Content Studio</strong>
+            <span>Thirukkural Project</span>
+          </span>
+        </a>
+        <button type="button" class="ui-btn-icon sidebar-close" id="sidebar-close" aria-label="Close menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebar-nav" aria-label="Admin navigation"></nav>
+
+      <div class="sidebar-footer">
+        <a href="index.html" class="sidebar-back-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+          Back to Public Site
+        </a>
+      </div>
+    </aside>
+
+    <div class="admin-main">
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="ui-btn-icon topbar-menu-btn" id="sidebar-open" aria-label="Open menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div>
+            <h1 class="topbar-title">Kural Studio</h1>
+            <div class="topbar-breadcrumb">
+              <a href="kurals.html" style="color: inherit; text-decoration: none;">Kurals</a>
+              <span>/</span>
+              <span id="breadcrumb-kural">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button type="button" class="ui-btn-icon" id="theme-toggle" aria-label="Switch theme"></button>
+          <div class="topbar-user">
+            <span class="topbar-avatar">AD</span>
+            <span class="topbar-user-info">
+              <span class="topbar-user-name">Admin</span>
+              <span class="topbar-user-role">Content Manager</span>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main class="admin-content" id="kural-detail-root">
+
+        <!-- Header -->
+        <section class="script-detail-header ui-card">
+          <div class="ui-card-body">
+            <div class="sd-header-top">
+              <div class="sd-header-info">
+                <div class="sd-header-badges">
+                  <span class="kural-badge" id="kd-kural-id">TK-0000</span>
+                  <span class="ui-badge ui-badge-muted" id="kd-theme">Theme</span>
+                  <span class="ui-badge ui-badge-warning" id="kd-availability" hidden>Not available yet</span>
+                </div>
+                <h1 class="sd-title" id="kd-title">Kural Studio</h1>
+                <div class="sd-meta-row">
+                  <span id="kd-meta-summary">Kural Database · Story Library · Script Page · Character Library — one page per kural</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Kural text -->
+        <section class="ui-card sd-story-preview">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Kural</h2>
+            <span class="ui-card-subtitle">Kural Database</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="sd-kural-box">
+              <p class="sd-kural-tamil" id="kd-kural-tamil"></p>
+              <p class="sd-kural-en" id="kd-kural-en"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Story -->
+        <section class="ui-card sd-story-preview">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Story</h2>
+            <span class="ui-card-subtitle">Read-only — sourced from Story Library</span>
+          </div>
+          <div class="ui-card-body">
+            <p id="kd-story-text" class="sd-story-text"></p>
+          </div>
+        </section>
+
+        <!-- Characters -->
+        <section class="ui-card">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Characters</h2>
+            <span class="ui-card-subtitle">Read-only — sourced from Character Library</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="kd-character-list" id="kd-character-list"></div>
+          </div>
+        </section>
+
+        <!-- Scenes -->
+        <section class="ui-card sd-timeline-section">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Scenes</h2>
+            <span class="ui-card-subtitle">Read-only — sourced from the Script Page</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="scene-timeline" id="kd-scene-timeline"></div>
+          </div>
+        </section>
+
+        <!-- Kural Studio images -->
+        <section class="ui-card">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Kural Studio — Images</h2>
+            <span class="ui-card-subtitle">AI-generated via Gemini, stored in Google Drive</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="kd-image-grid">
+              <div class="kd-image-card" id="kd-character-image-card">
+                <h3 class="kd-image-title">Final Character Image</h3>
+                <div class="kd-image-frame">
+                  <img id="kd-character-image" alt="Generated character image" hidden>
+                  <div class="kd-image-placeholder" id="kd-character-placeholder">No image yet</div>
+                </div>
+                <div class="kd-image-actions">
+                  <span class="ui-badge ui-badge-muted" id="kd-character-status">Not generated</span>
+                  <button type="button" class="ui-btn ui-btn-primary" id="kd-generate-character">Generate Character Image</button>
+                </div>
+              </div>
+              <div class="kd-image-card" id="kd-scene-image-card">
+                <h3 class="kd-image-title">Scene Image</h3>
+                <div class="kd-image-frame">
+                  <img id="kd-scene-image" alt="Generated scene image" hidden>
+                  <div class="kd-image-placeholder" id="kd-scene-placeholder">No image yet</div>
+                </div>
+                <div class="kd-image-actions">
+                  <span class="ui-badge ui-badge-muted" id="kd-scene-status">Not generated</span>
+                  <button type="button" class="ui-btn ui-btn-primary" id="kd-generate-scene">Generate Scene Image</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="js/shared-prompts.js?v=1"></script>
+  <script src="js/shared.js?v=2"></script>
+  <script src="js/dashboard.js?v=6"></script>
+  <script src="js/scripts-data.js?v=6"></script>
+  <script src="js/characters-data-comprehensive.js?v=1"></script>
+  <script src="js/kural-detail.js?v=1"></script>
+</body>
+</html>

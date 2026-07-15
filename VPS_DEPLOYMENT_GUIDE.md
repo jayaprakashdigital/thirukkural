@@ -148,11 +148,42 @@ chmod +x /home/jp-ai-content-studios/deploy.sh
 
 ---
 
+## Step 3B️⃣: Kural Studio Service (AI Image Generation, Optional)
+
+Kural Studio (`kural-detail.html` + `studio-server.js`) generates per-kural
+character/scene images via Gemini and stores them in Google Drive. Full
+credential setup (Gemini API key, Google OAuth client, Drive folder) is a
+one-time process documented in `docs/KURAL_STUDIO_SETUP.md` — do that first.
+
+```bash
+cd /home/jp-ai-content-studios/thirukkural
+
+# Export the vars from docs/KURAL_STUDIO_SETUP.md (or source a .env file)
+pm2 start studio-server.js --name "thirukkural-studio"
+pm2 save
+
+pm2 logs thirukkural-studio
+```
+
+`studio-server.js` fails fast at boot (same as `deploy-webhook.js` does for
+`WEBHOOK_SECRET`) if `GEMINI_API_KEY`, `GOOGLE_OAUTH_CLIENT_ID`,
+`GOOGLE_OAUTH_CLIENT_SECRET`, `GOOGLE_OAUTH_REFRESH_TOKEN`, or
+`GOOGLE_DRIVE_FOLDER_ID` is missing — check `pm2 logs` if it won't start.
+
+If you're using the Docker Compose stack instead of PM2, this is already
+wired up as the `studio` service in `docker-compose.yml` — just fill in the
+same env vars in `.env` and `docker compose up -d --build`.
+
+---
+
 ## Step 4️⃣: Open Firewall Port
 
 ```bash
 # Allow port 3600 (webhook server)
 sudo ufw allow 3600/tcp
+
+# Allow port 3700 (Kural Studio API, if running it)
+sudo ufw allow 3700/tcp
 
 # Or if using UFW (check status first)
 sudo ufw status
@@ -305,6 +336,7 @@ tail -f /var/log/thirukkural-deploy.log
 - **Stories:** http://187.127.165.149/stories.html
 - **Characters:** http://187.127.165.149/characters-table.html
 - **Webhook Health:** http://187.127.165.149:3600/health
+- **Kural Studio Health:** http://187.127.165.149:3700/health (or `/studio/status/TK-0001` through nginx)
 
 ---
 
