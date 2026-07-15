@@ -67,15 +67,15 @@ const SCRIPT_SOURCE_STORIES = [
     story: "Arjun scores 98 in Maths but can't fix a punctured tyre or cook rice when Amma is sick. Teacher Meenakshi sits beside him. That evening, Arjun uses his maths to help a farmer calculate crop costs, and smiles for the first time that day.",
     tamilDialogues: [
       "Arjun: 'Teacher, 98 மார்க் வாங்கியும் ஒன்னும் தெரியல.'",
-      "Teacher: 'கற்றதனால் ஆய பயன் கையால் எடுக்க முடியாத பயன்.'",
+      "Teacher: 'கற்றதனால் ஆய பயனென்கொல் வாலறிவன் நற்றாள் தொழாஅர் எனின்.'",
       "Arjun: 'அப்படின்னா என்ன அர்த்தம்?'",
-      "Teacher: 'உன் அறிவு உனக்கு மட்டும் சொந்தம் இல்ல. உலகத்துக்கு உதவணும்.'"
+      "Teacher: 'உன் அறிவு உனக்கு மட்டும் சொந்தம் இல்ல. தலை குனிந்து உலகத்துக்கு உதவும்போதுதான் அது மெய்யான கல்வி.'"
     ],
     thiruvalluvarAppears: "As Arjun helps the farmer, a warm breeze blows. Thiruvalluvar appears under the neem tree, his eyes gentle with approval.",
-    thiruvalluvarExplanation: "கற்றதனால் ஆய பயன் கையால் எடுக்க முடியாத பயன். படிப்பு என்பது வெறும் மார்க் அல்ல. வாழ்க்கையை மாற்றும் ஆற்றல்.",
-    thirukkural: "கற்றதனால் ஆய பயன் கையால் எடுக்க முடியாத பயன்.",
-    englishTranslation: "The benefit of learning is a benefit that cannot be taken away by hand.",
-    moral: "True learning is not marks — it is the power to change lives."
+    thiruvalluvarExplanation: "தூய அறிவின் திருவடிகளை தொழாதவர்க்கு, கற்ற கல்வியால் பயன் ஒன்றுமில்லை. அறிவின் உச்சம் பணிவுடன் பயன்படுத்துவதே — அதுவே மெய்யான கல்வி.",
+    thirukkural: "கற்றதனால் ஆய பயனென்கொல் வாலறிவன் நற்றாள் தொழாஅர் எனின்.",
+    englishTranslation: "That lore is vain which does not fall At His good feet who knoweth all",
+    moral: "Knowledge without humility and service is no knowledge at all."
   },
   {
     id: "TK-0003", kuralNumber: 3,
@@ -92,10 +92,10 @@ const SCRIPT_SOURCE_STORIES = [
       "Paati: 'நல்ல வாழ்க்கை வாழ்றது இதுதான் — சின்ன சின்ன நல்ல காரியங்கள் தினமும் செய்யறது.'"
     ],
     thiruvalluvarAppears: "The morning sun casts a golden glow. Thiruvalluvar stands near the temple steps, watching the two flowers on the statue.",
-    thiruvalluvarExplanation: "அறம் என்பது பெரிய காரியம் அல்ல. தினமும் செய்யும் சின்ன நல்ல செயல்களே அறம். அதுவே வாழ்க்கையை அழகாக்கும்.",
-    thirukkural: "அறத்தாறு இதுவன்னோ உலகம் புரந்தார் புரிந்த வினையால் காண்.",
-    englishTranslation: "Is there a path of virtue? See it through the deeds of those who sustained the world.",
-    moral: "A good life is built with small daily acts of kindness."
+    thiruvalluvarExplanation: "மலரில் வீற்றிருக்கும் இறைவனின் சிறந்த திருவடிகளை நினைத்து தொழுபவர், இப்பூமியில் நெடுங்காலம் நிலைத்து வாழ்வார். சின்ன பூவானாலும், அன்புடன் செய்யும் தொழுகையே பெரியது.",
+    thirukkural: "மலர்மிசை ஏகினான் மாணடி சேர்ந்தார் நிலமிசை நீடுவாழ் வார்.",
+    englishTranslation: "Long they live on earth who gain The feet of God in florid brain",
+    moral: "Even a small daily act of devotion at God's feet brings a long, blessed life."
   },
   {
     id: "TK-0004", kuralNumber: 4,
@@ -109,13 +109,13 @@ const SCRIPT_SOURCE_STORIES = [
       "Senthil: 'Thatha, இந்த மாங்காய் எல்லாம் எனக்கு வேணும்!'",
       "Thatha: 'ஒன்னு எடுத்தா போதும்னு தெரியலையா?'",
       "Senthil: 'ஆசை அதிகமானதும் சுகம் குறைஞ்சுது.'",
-      "Thatha: 'ஆசை இல்லாதவன் துன்பம் இல்லாதவன்.'"
+      "Thatha: 'வேண்டுதல் வேண்டாமை இலானடி சேர்ந்தார்க்கு யாண்டும் இடும்பை இல.'"
     ],
     thiruvalluvarAppears: "As the last mango rolls away, a gentle wind blows. Thiruvalluvar appears at the garden gate, his face calm and wise.",
-    thiruvalluvarExplanation: "ஆசை என்பது தீ போன்றது. அது சிறிதாக இருக்கும்போது சுவை. அதிகமானால் எல்லாத்தையும் எரிக்கும். ஆசை இல்லாதவன் துன்பம் இல்லாதவன்.",
-    thirukkural: "ஆசை இல்லாதவன் துன்பம் இல்லாதவன்.",
-    englishTranslation: "He who has no desire is free from suffering.",
-    moral: "Greed takes away what you already have."
+    thiruvalluvarExplanation: "ஆசை என்பது தீ போன்றது. அது சிறிதாக இருக்கும்போது சுவை. அதிகமானால் எல்லாத்தையும் எரிக்கும். இறைவன் விருப்பு வெறுப்பு இல்லாதவன் — அவன் அடி சேர்ந்தவர்க்கு எப்போதும் எந்த துன்பமும் இல்லை.",
+    thirukkural: "வேண்டுதல் வேண்டாமை இலானடி சேர்ந்தார்க்கு யாண்டும் இடும்பை இல.",
+    englishTranslation: "Who hold His feet who likes nor loathes Are free from woes of human births",
+    moral: "Freedom from desire — like God's — frees you from suffering."
   },
   {
     id: "TK-0005", kuralNumber: 5,
