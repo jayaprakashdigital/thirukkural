@@ -194,34 +194,6 @@ body.dashboard-body { overflow-x: hidden; }
   color: var(--gold);
 }
 
-.sidebar-footer {
-  padding: 1rem 0.75rem;
-  border-top: 1px solid var(--border);
-}
-
-.sidebar-back-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: 10px;
-  text-decoration: none;
-  color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 500;
-  transition: color 0.2s, background 0.2s;
-}
-
-.sidebar-back-link:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.sidebar-back-link svg {
-  width: 16px;
-  height: 16px;
-}
-
 .sidebar-overlay {
   display: none;
   position: fixed;

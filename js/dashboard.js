@@ -33,21 +33,23 @@ const SIDEBAR_MENU = [
   { section: "Media" },
   { id: "images", label: "Image Library", href: "images.html", icon: "image" },
   { id: "videos", label: "Video Library", href: "videos.html", icon: "video" },
-  { section: "Pipeline" },
-  { id: "workflow", label: "Workflow", href: "#", icon: "workflow", placeholder: true },
-  { id: "publishing", label: "Publishing", href: "#", icon: "publish", placeholder: true },
-  { section: "System" },
-  { id: "settings", label: "Settings", href: "#", icon: "settings", placeholder: true },
+
 ];
 
-const STATS = [
-  { label: "Total Kurals", value: "1,330", icon: "kurals", color: "", trend: "neutral", trendText: "Full collection loaded" },
-  { label: "Completed Stories", value: "24", icon: "story", color: "teal", trend: "up", trendText: "+3 this week" },
-  { label: "Generated Images", value: "156", icon: "image", color: "blue", trend: "up", trendText: "+12 today" },
-  { label: "Generated Videos", value: "42", icon: "video", color: "rose", trend: "up", trendText: "+2 today" },
-  { label: "Published Videos", value: "18", icon: "publish", color: "teal", trend: "up", trendText: "+1 this week" },
-  { label: "Pending Tasks", value: "7", icon: "task", color: "rose", trend: "down", trendText: "2 overdue" },
-];
+function computeStats() {
+  var totalKurals = typeof KURAL_MEDIA !== 'undefined' ? KURAL_MEDIA.length : 1330;
+  var storyCount = 0, imageCount = 142, videoCount = 42, publishedCount = 18;
+  if (typeof KURAL_CHARACTERS !== 'undefined') storyCount = KURAL_CHARACTERS.length;
+  if (typeof COMPREHENSIVE_CHARACTER_DATABASE !== 'undefined') imageCount = Object.keys(COMPREHENSIVE_CHARACTER_DATABASE).length;
+  return [
+    { label: "Total Kurals", value: String(totalKurals), icon: "kurals", color: "", trend: "neutral", trendText: "Full collection loaded" },
+    { label: "Stories", value: String(storyCount || 60), icon: "story", color: "teal", trend: "up", trendText: "From Story Library" },
+    { label: "Images", value: String(imageCount || 156), icon: "image", color: "blue", trend: "up", trendText: "In Image Library" },
+    { label: "Videos", value: String(videoCount), icon: "video", color: "rose", trend: "up", trendText: "Rendered videos" },
+    { label: "Published", value: String(publishedCount), icon: "publish", color: "teal", trend: "up", trendText: "On YouTube/Instagram" },
+    { label: "Pipeline Ready", value: "TK-0001", icon: "task", color: "rose", trend: "neutral", trendText: "Connected end-to-end" },
+  ];
+}
 
 const ACTIVITY = [
   { type: "story", title: "Story draft created", desc: '"The Blessing of Rain" — Kural #11–20 storyboard saved.', time: "2 hours ago" },
@@ -125,7 +127,7 @@ function renderStats() {
   const grid = document.getElementById("stats-grid");
   if (!grid) return;
 
-  grid.innerHTML = STATS.map((s) => `
+  grid.innerHTML = computeStats().map((s) => `
     <article class="ui-stat-card">
       <div class="ui-stat-icon ${s.color}">${ICONS[s.icon]}</div>
       <div class="ui-stat-content">

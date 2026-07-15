@@ -396,12 +396,70 @@ function deriveCharacterProfile(kuralNumber, index, rawStr, storyEntry) {
   return c;
 }
 
+/* ===== THIRUVALLUVAR — synthetic character appearing in every kural ===== */
+function deriveThiruvalluvar(kuralNumber, storyEntry) {
+  var kuralIdStr = (typeof kuralId === "function") ? kuralId(kuralNumber) : "TK-" + String(kuralNumber).padStart(4, "0");
+  var c = Object.assign({}, defaultExtendedFields(), {
+    id: kuralIdStr + "-tv",
+    name: "Thiruvalluvar",
+    transliteration: "Tiruvalluvar",
+    gender: "Male",
+    role: "Sage / Author",
+    consistency: "Primary — appears across all kurals",
+    kuralNumber: kuralNumber,
+    kuralId: kuralIdStr,
+    age: "",
+    ageGroup: "Mature (50+)",
+    height: "5'10\"",
+    weight: "",
+    bodyType: "lean, dignified",
+    skinTone: "warm brown",
+    faceShape: "long",
+    hairStyle: "short white crop",
+    hairColor: "white",
+    eyeColor: "dark brown",
+    facialHair: "full white beard",
+    specialMarks: "a gentle smile that carries infinite wisdom",
+    defaultCostume: "white veshti (dhoti) with a thin border, bare chest with a sacred thread",
+    footwear: "bare feet",
+    accessories: "a single palm-leaf manuscript tucked at the waist",
+    jewelry: "none",
+    props: "palm-leaf manuscript",
+    traits: "wise, patient, compassionate, illuminating, timeless",
+    behaviour: "appears silently at the moment of greatest emotional need, speaks in short Tamil parables with a warm smile, disappears without ceremony",
+    emotionStyle: "serene and knowing",
+    strengths: "deep wisdom of the Kural, perfect emotional timing, authority to teach without arrogance",
+    weaknesses: "speaks in riddles that children take a lifetime to understand",
+    speakingStyle: "speaks in slow, measured Tamil, each word weighted with centuries of meaning",
+    walkingStyle: "unhurried, steady, feet barely disturbing the dust",
+    language: "Tamil",
+    accent: "Classical Tamil — timeless, regionless",
+    voiceGender: "Male",
+    voiceStyle: "deep baritone with a warm resonance, like distant temple bells",
+    speakingSpeed: "0.8",
+    pitch: "0.75",
+    voiceEmotion: "Calm",
+    storyContext: storyEntry ? {
+      title: storyEntry.title || "", theme: storyEntry.theme || "", emotions: storyEntry.emotions || "",
+      location: storyEntry.location || "", hook: storyEntry.hook || "", moral: storyEntry.moral || ""
+    } : null
+  });
+  c.description = "Thiruvalluvar, the author of the Thirukkural, appears in " + kuralIdStr + " as the wise guide who reveals the deeper meaning of the verse. He arrives at the pivotal moment — " + (storyEntry ? storyEntry.hook || "the moment of crisis or discovery" : "the moment of crisis or discovery") + " — and explains the kural with a gentle smile before departing.";
+  autoGenCharPrompts(c);
+  return c;
+}
+
 /* ===== KURAL -> CHARACTERS RESOLUTION (overrides characters-data.js) ===== */
 function deriveKuralCharacters(kuralNumber) {
   if (typeof KURAL_CHARACTERS === "undefined") return [];
   var entry = KURAL_CHARACTERS[kuralNumber - 1];
-  if (!entry || !entry.characters || !entry.characters.length) return [];
-  return entry.characters.map(function (raw, i) { return deriveCharacterProfile(kuralNumber, i, raw, entry); });
+  if (!entry) return [];
+  var chars = [];
+  if (entry.characters && entry.characters.length) {
+    chars = entry.characters.map(function (raw, i) { return deriveCharacterProfile(kuralNumber, i, raw, entry); });
+  }
+  chars.push(deriveThiruvalluvar(kuralNumber, entry));
+  return chars;
 }
 
 function getKuralsWithCharacters() {

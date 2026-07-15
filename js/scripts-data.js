@@ -132,10 +132,10 @@ const SCRIPT_SOURCE_STORIES = [
       "Appa: 'மழை. வெயில். மண். கடவுள்.'"
     ],
     thiruvalluvarAppears: "The paddy field glows with morning light. Thiruvalluvar appears between the rows of green, his feet bare on the wet earth.",
-    thiruvalluvarExplanation: "உலகில் உயிர்கள் வளர்வதற்கு காரணம் இறைவன். மழையும் வெயிலும் மண்ணும் அவன் கொடுத்த வரம். அதனால் உலகம் செழிக்கிறது.",
-    thirukkural: "வானம் பொழியும் அருட்சுடர் அதனால் உலகு செழிக்கும்.",
-    englishTranslation: "The rain that falls from heaven is a divine light. The world flourishes because of it.",
-    moral: "Every seed that grows is proof of God's grace."
+    thiruvalluvarExplanation: "இருள்சேர் இருவினையும் சேரா — இறைவனை உண்மையாகப் புகழ்பவர் நன்மை தீமை ஆகிய இரண்டின் பிடியிலும் சிக்கமாட்டார். அவர் இரண்டுக்கும் அப்பாற்பட்டவர்.",
+    thirukkural: "இருள்சேர் இருவினையும் சேரா இறைவன் பொருள்சேர் புகழ்புரிந்தார் மாட்டு.",
+    englishTranslation: "God's praise who tell, are free from right and wrong, the twins of dreaming night.",
+    moral: "Those who truly praise God are untouched by both good and bad deeds."
   },
   {
     id: "TK-0006", kuralNumber: 6,
@@ -389,8 +389,8 @@ function buildScenesFromStory(src) {
   const secondary = src.characters[1] || "";
   const allCharacters = src.characters.slice();
   const withThiru = allCharacters.concat(["Thiruvalluvar"]);
-  const IMG_STYLE = "cinematic realism, Tamil heritage aesthetic, warm earthy palette, 4K, high detail, professional cinematography";
-  const VID_STYLE = "24fps, color graded, cinematic, smooth motion";
+  var IMG_STYLE = STUDIO_STYLE.artStyle + ", " + STUDIO_STYLE.imageQuality;
+  var VID_STYLE = STUDIO_STYLE.videoQuality;
   const LOC = location.toLowerCase();
 
   return [
