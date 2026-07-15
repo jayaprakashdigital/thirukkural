@@ -246,7 +246,38 @@ function parseDialogueLine(line) {
   return { character: match[1].trim(), line: match[2].trim() };
 }
 
-function padScene(kuralNumber, sceneNumber, title, duration, location, characters, narration, dialogueLines, emotion, camera, transition, imagePrompt, videoPrompt) {
+// Camera department + location/atmosphere defaults per scene position (1-5),
+// matching the fixed Hook/Rising/Turning/Wisdom/Moral structure.
+const SCENE_CAMERA_PRESETS = [
+  { cameraAngle: "Wide Shot", cameraMovement: "Dolly", lens: "35mm", shotType: "Establishing", composition: "Rule of Thirds", focus: "Deep Focus", timeOfDay: "Morning", expression: "Curious", pose: "Standing", action: "Looking around" },
+  { cameraAngle: "Medium", cameraMovement: "Pan", lens: "50mm", shotType: "Medium Close-Up", composition: "Rule of Thirds", focus: "Shallow DOF", timeOfDay: "Afternoon", expression: "Hopeful", pose: "Sitting", action: "Talking" },
+  { cameraAngle: "Close Up", cameraMovement: "Zoom", lens: "85mm", shotType: "Reaction", composition: "Center", focus: "Shallow DOF", timeOfDay: "Afternoon", expression: "Realization", pose: "Facing camera", action: "Reacting" },
+  { cameraAngle: "Top View", cameraMovement: "Tracking", lens: "24mm", shotType: "Establishing", composition: "Symmetry", focus: "Deep Focus", timeOfDay: "Evening", expression: "Reverent", pose: "Kneeling", action: "Listening" },
+  { cameraAngle: "Wide Shot", cameraMovement: "Pan", lens: "35mm", shotType: "Master", composition: "Golden Ratio", focus: "Deep Focus", timeOfDay: "Evening", expression: "Content", pose: "Standing", action: "Reflecting" }
+];
+
+const SCENE_AMBIENT_BY_LOCATION = {
+  Temple: "Temple Bells", School: "Birds", House: "Silence", Market: "Market Crowd",
+  Forest: "Forest", River: "River", Village: "Birds"
+};
+
+const EMOTION_TO_VOICE_EMOTION = {
+  Curious: "Gentle", Hope: "Warm", Proud: "Inspiring", Happy: "Joyful", Sad: "Calm", Fear: "Dramatic"
+};
+
+function extractAge(characterLabel) {
+  const match = /\((\d+)/.exec(characterLabel || "");
+  return match ? match[1] : "";
+}
+
+function padScene(kuralNumber, sceneNumber, title, duration, location, characters, narration, dialogueLines, emotion, camera, transition, imagePrompt, videoPrompt, goal, src) {
+  const preset = SCENE_CAMERA_PRESETS[sceneNumber - 1];
+  const weather = "Clear";
+  const environment = src.location;
+  const ambientSound = SCENE_AMBIENT_BY_LOCATION[location] || "Silence";
+  const voiceEmotion = EMOTION_TO_VOICE_EMOTION[emotion] || "Calm";
+  const protagonist = characters[0] || "Protagonist";
+
   return {
     sceneId: `TK-${String(kuralNumber).padStart(4, "0")}-S${sceneNumber}`,
     sceneNumber,
@@ -261,7 +292,72 @@ function padScene(kuralNumber, sceneNumber, title, duration, location, character
     transition,
     imagePrompt,
     videoPrompt,
-    status: "Draft"
+    status: "Draft",
+
+    // General
+    goal,
+    moral: src.moral,
+    learningObjective: `Understand: ${src.theme}`,
+
+    // Characters
+    characterAge: extractAge(protagonist),
+    costume: "Traditional South Indian attire",
+    expression: preset.expression,
+    pose: preset.pose,
+    action: preset.action,
+
+    // Location
+    environment,
+    weather,
+    season: "Summer",
+    timeOfDay: preset.timeOfDay,
+    lighting: /evening|dusk|night/i.test(preset.timeOfDay) ? "Golden Hour" : "Natural",
+
+    // Camera
+    cameraAngle: preset.cameraAngle,
+    cameraMovement: preset.cameraMovement,
+    lens: preset.lens,
+    shotType: preset.shotType,
+    composition: preset.composition,
+    focus: preset.focus,
+
+    // Image AI
+    masterImagePrompt: imagePrompt,
+    characterPrompt: autoGenCharacterPrompt(characters, preset.expression, location),
+    backgroundPrompt: autoGenBackgroundPrompt(location, preset.timeOfDay, weather),
+    stylePrompt: STUDIO_STYLE.artStyle + ", " + STUDIO_STYLE.imageQuality,
+    lightingPrompt: autoGenLightingPrompt(preset.timeOfDay, weather),
+    negativePrompt: STUDIO_STYLE.negative,
+    imageModel: "DALL-E 3",
+    imageStatus: "Pending",
+
+    // Video AI
+    masterVideoPrompt: videoPrompt,
+    cameraMotionPrompt: "Smooth " + preset.cameraMovement.toLowerCase() + " with " + transition.toLowerCase() + " transition. " + STUDIO_STYLE.videoQuality + ".",
+    animationPrompt: "Subtle natural motion, " + emotion.toLowerCase() + " mood pacing, gentle ambient movement. " + STUDIO_STYLE.videoQuality + ".",
+    videoModel: "Runway Gen-3",
+    fps: 24,
+    aspectRatio: "16:9",
+
+    // Voice
+    narrationVoice: "Narrator",
+    voiceGender: "Female",
+    voiceAge: "Middle (35-50)",
+    voiceEmotion,
+    voiceAccent: "Tamil Nadu",
+    speed: 1.0,
+    pitch: 1.0,
+    language: "Tamil",
+
+    // Audio
+    backgroundMusic: autoGenMusicPrompt(emotion, environment),
+    ambientSound,
+    soundEffects: [],
+    volume: 0.8,
+    fadeIn: 2,
+    fadeOut: 2,
+
+    assetStatus: "Not Generated"
   };
 }
 
@@ -288,27 +384,32 @@ function buildScenesFromStory(src) {
     padScene(src.kuralNumber, 1, "The Hook", 8, location, allCharacters,
       src.hook, src.tamilDialogues.slice(0, 1), "Curious", "Wide Shot", "Cut",
       `Wide establishing shot of ${LOC} setting. ${protagonist} at the center of the moment: ${src.hook}. ${IMG_STYLE}.`,
-      `8s wide establishing shot of ${LOC}. Slow dolly-in toward ${protagonist}. Curious, intriguing mood. ${VID_STYLE}.`),
+      `8s wide establishing shot of ${LOC}. Slow dolly-in toward ${protagonist}. Curious, intriguing mood. ${VID_STYLE}.`,
+      "Hook the viewer with curiosity", src),
 
     padScene(src.kuralNumber, 2, "Rising Moment", 10, location, allCharacters,
       src.story, src.tamilDialogues.slice(1, 3), "Hope", "Medium", "Cut",
       `Medium shot of ${protagonist}${secondary ? " and " + secondary : ""} in conversation at ${LOC} setting. Warm natural light, hopeful mood. ${IMG_STYLE}.`,
-      `10s medium shot dialogue scene between ${protagonist}${secondary ? " and " + secondary : ""} at ${LOC}. Gentle pan, soft over-the-shoulder framing. ${VID_STYLE}.`),
+      `10s medium shot dialogue scene between ${protagonist}${secondary ? " and " + secondary : ""} at ${LOC}. Gentle pan, soft over-the-shoulder framing. ${VID_STYLE}.`,
+      "Build the story and relationship", src),
 
     padScene(src.kuralNumber, 3, "The Turning Point", 8, location, allCharacters,
       src.tamilDialogues[3] ? parseDialogueLine(src.tamilDialogues[3]).line : src.story, src.tamilDialogues.slice(3, 4), "Proud", "Close Up", "Cut",
       `Close up on ${protagonist}'s face at the moment of realization. Emotional turning point, expressive eyes, soft portrait lighting. ${IMG_STYLE}.`,
-      `8s close up capturing the emotional shift in ${protagonist}. Subtle push-in, shallow depth of field. Proud, reflective mood. ${VID_STYLE}.`),
+      `8s close up capturing the emotional shift in ${protagonist}. Subtle push-in, shallow depth of field. Proud, reflective mood. ${VID_STYLE}.`,
+      "Land the emotional turning point", src),
 
     padScene(src.kuralNumber, 4, "Thiruvalluvar's Wisdom", 12, location, withThiru,
       `${src.thiruvalluvarAppears} ${src.thiruvalluvarExplanation}`, [], "Hope", "Top View", "Dissolve",
       `Thiruvalluvar appears bathed in golden divine light at ${LOC}. Serene sage in white robes, reverent atmosphere, radiant halo. Kural text overlay: "${src.thirukkural}". ${IMG_STYLE}.`,
-      `12s dissolve transition introducing Thiruvalluvar at ${LOC}. Slow crane down to sage, golden hour rays. Voice-over recites: "${src.thirukkural}" ("${src.englishTranslation}"). ${VID_STYLE}.`),
+      `12s dissolve transition introducing Thiruvalluvar at ${LOC}. Slow crane down to sage, golden hour rays. Voice-over recites: "${src.thirukkural}" ("${src.englishTranslation}"). ${VID_STYLE}.`,
+      "Reveal Thiruvalluvar's wisdom", src),
 
     padScene(src.kuralNumber, 5, "The Moral", 7, location, allCharacters,
       src.moral, [], "Happy", "Pan", "Fade",
       `Wide pan shot closing on ${protagonist} at ${LOC}. Peaceful resolution, warm golden hour lighting, hopeful mood. ${IMG_STYLE}.`,
-      `7s closing pan shot of ${protagonist}. Slow horizontal pan, warm golden hour light. Narration: "${src.moral}". Fade to title card. ${VID_STYLE}.`)
+      `7s closing pan shot of ${protagonist}. Slow horizontal pan, warm golden hour light. Narration: "${src.moral}". Fade to title card. ${VID_STYLE}.`,
+      "Land the moral, close the story", src)
   ];
 }
 
