@@ -780,8 +780,8 @@ function openModal(n) {
   const modal = document.getElementById("story-modal");
   if (!modal) return;
 
-  const chars = (s.chars || []).map((c) =>
-    `<span class="story-avatar" title="${esc(c)}">${esc(initials(c))}</span>`
+  const chars = (s.chars || []).map((c, i) =>
+    `<a class="story-avatar" href="character-detail.html?kural=${n}&c=${i}" title="${esc(c)} — view full character profile">${esc(initials(c))}</a>`
   ).join("");
 
   const tvParts = (s.tv || "").split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
@@ -817,6 +817,7 @@ function openModal(n) {
       <div class="modal-characters">
         ${chars}
         <span class="modal-place">${esc(s.location)}</span>
+        <a class="link-chip" href="character-detail.html?kural=${n}">View Characters &rarr;</a>
       </div>
       <div class="modal-acts">
         <div class="act-card">

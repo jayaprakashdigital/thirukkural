@@ -101,6 +101,13 @@ const COLUMNS = [
     render: (r) => `<span class="num-badge">${r.Number}</span>`,
   },
   {
+    key: "characters",
+    label: "Characters",
+    className: "col-meta",
+    render: (r) =>
+      `<a class="link-chip" href="character-detail.html?kural=${r.Number}">View &rarr;</a>`,
+  },
+  {
     key: "paal",
     label: "Paal",
     className: "col-meta",

@@ -3,59 +3,53 @@
  * Single source of truth for all character data across the AI pipeline.
  */
 
-var CHAR_STORE_KEY = "thirukkural-character-store";
+/* Storage layer, defaultExtendedFields(), autoGenCharPrompts(), saveChar(),
+   and deleteCharFromStore() now live in js/character-derive.js, shared with
+   character-detail.html. */
 var charCache = [];
 var editingCharId = null;
 var charActiveTab = "general";
+var CHAR_PAGE_SIZE = 60;
+var charPage = 1;
 
-/* ===== STORAGE LAYER ===== */
-function loadCharStore() {
-  try { return JSON.parse(localStorage.getItem(CHAR_STORE_KEY)) || {}; }
-  catch (e) { return {}; }
-}
-function saveCharStore(store) {
-  try { localStorage.setItem(CHAR_STORE_KEY, JSON.stringify(store)); } catch (e) {}
-}
-
-function defaultExtendedFields() {
-  return {
-    nickname: "", status: "Active", description: "",
-    age: "", height: "", weight: "", bodyType: "", skinTone: "", faceShape: "",
-    hairStyle: "", hairColor: "", eyeColor: "", facialHair: "", specialMarks: "",
-    defaultCostume: "", footwear: "", accessories: "", jewelry: "", props: "", seasonalOutfit: "", festivalOutfit: "",
-    traits: "", behaviour: "", emotionStyle: "", strengths: "", weaknesses: "", speakingStyle: "", walkingStyle: "",
-    language: "Tamil", accent: "", voiceGender: "", voiceStyle: "", speakingSpeed: 1.0, pitch: 1.0, voiceEmotion: "Calm",
-    masterPrompt: "", facePrompt: "", bodyPrompt: "", costumePrompt: "", expressionPrompt: "", posePrompt: "", negativePrompt: "", stylePrompt: "",
-    frontView: "", sideView: "", backView: "", expressionSheet: "", poseSheet: "", costumeSheet: "",
-    lockFace: false, lockHair: false, lockSkin: false, lockCostume: false, lockHeight: false, lockAccessories: false,
-    videoWalkingStyle: "", handMovement: "", eyeMovement: "", smile: "", idlePose: "", animationStyle: "",
-    voiceLock: false, emotionRange: "", defaultVoice: "", voiceReference: "",
-    storiesUsed: [], scriptsUsed: [], scenesUsed: [], imagesGenerated: 0, videosGenerated: 0,
-    relationships: { father: "", mother: "", teacher: "", friend: "", villain: "", animal: "", village: "", familyMembers: "" },
-    versionHistory: [], createdAt: "", modifiedAt: "", version: 1, promptVersion: "v1.0", uuid: ""
-  };
-}
-
+/* ===== MERGE: story-derived characters (primary) + legacy allegorical
+   characters (kept as extra, clearly-labeled cards — see character-derive.js
+   for why the primary source changed) + any user-added characters ===== */
 function getMergedCharacters() {
   var store = loadCharStore();
   var base = [];
+  var seenIds = {};
   var kurals = getKuralsWithCharacters ? getKuralsWithCharacters() : [];
   kurals.forEach(function (kn) {
     var chars = getCharactersForKural ? getCharactersForKural(kn) : [];
     if (Array.isArray(chars)) {
       chars.forEach(function (ch) {
-        base.push(Object.assign({}, defaultExtendedFields(), ch, {
-          kuralNumber: kn,
-          kuralId: "TK-" + String(kn).padStart(4, "0")
-        }, store[ch.id] || {}));
+        var merged = Object.assign({}, defaultExtendedFields(), ch, store[ch.id] || {});
+        base.push(merged);
+        seenIds[merged.id] = true;
       });
     }
   });
+  if (typeof CHARACTER_DATABASE === "object" && CHARACTER_DATABASE) {
+    Object.keys(CHARACTER_DATABASE).forEach(function (kn) {
+      (CHARACTER_DATABASE[kn] || []).forEach(function (ch) {
+        if (seenIds[ch.id]) return;
+        var merged = Object.assign({}, defaultExtendedFields(), ch, {
+          kuralNumber: Number(kn),
+          kuralId: "TK-" + String(kn).padStart(4, "0"),
+          legacy: true
+        }, store[ch.id] || {});
+        base.push(merged);
+        seenIds[merged.id] = true;
+      });
+    });
+  }
   Object.keys(store).forEach(function (id) {
-    if (!base.find(function (c) { return c.id === id; })) {
+    if (!seenIds[id]) {
       var sc = store[id];
       if (sc && !sc.archived) {
         base.push(Object.assign({}, defaultExtendedFields(), sc, { id: id }));
+        seenIds[id] = true;
       }
     }
   });
@@ -64,41 +58,6 @@ function getMergedCharacters() {
 
 function getCharById(id) {
   return charCache.find(function (c) { return c.id === id; });
-}
-
-function saveChar(char) {
-  var store = loadCharStore();
-  char.modifiedAt = new Date().toISOString();
-  if (!char.createdAt) char.createdAt = char.modifiedAt;
-  if (!char.uuid) char.uuid = "char-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
-  store[char.id] = Object.assign({}, store[char.id] || {}, char);
-  saveCharStore(store);
-}
-
-function deleteCharFromStore(id) {
-  var store = loadCharStore();
-  delete store[id];
-  saveCharStore(store);
-}
-
-/* ===== AI PROMPT AUTO-GENERATION ===== */
-function autoGenCharPrompts(c) {
-  var desc = c.description || c.name + " is a " + (c.role || "character") + " in " + (c.kuralId || "a Thirukkural story") + ".";
-  c.masterPrompt = desc + " " + (c.gender || "") + " character, " + (c.age || "adult") + " years old. " +
-    "Traditional Tamil setting. Cinematic lighting, 4K, highly detailed, professional portrait.";
-  c.facePrompt = (c.faceShape || "oval") + " face, " + (c.skinTone || "warm brown") + " skin, " +
-    (c.eyeColor || "dark brown") + " eyes, " + (c.hairStyle || "traditional") + " " + (c.hairColor || "black") + " hair. Detailed facial features, portrait lighting.";
-  c.bodyPrompt = (c.bodyType || "average") + " build, " + (c.height || "average height") + ". " +
-    (c.walkingStyle || "confident posture") + ". Full body shot, anatomically correct.";
-  c.costumePrompt = (c.defaultCostume || "Traditional Tamil attire") + ". " +
-    (c.accessories || "") + " " + (c.jewelry || "") + " Detailed fabric textures, culturally accurate.";
-  c.expressionPrompt = (c.emotionStyle || "calm and serene") + " expression. " +
-    "Natural micro-expressions, " + (c.behaviour || "composed") + " demeanor.";
-  c.posePrompt = (c.pose || "standing naturally") + ". " + (c.walkingStyle || "Confident stance") + ". Full body pose reference.";
-  c.negativePrompt = "deformed, blurry, bad anatomy, extra limbs, ugly, low quality, distorted face, watermark, text";
-  c.stylePrompt = "Cinematic realism, golden hour lighting, Tamil cultural aesthetic, warm color palette, film grain, shallow depth of field";
-  c.promptVersion = "v2.0";
-  return c;
 }
 
 /* ===== STATS ===== */
@@ -145,15 +104,23 @@ function renderCard(c) {
   var tags = [];
   if (c.gender) tags.push('<span class="char-tag">' + esc(c.gender) + '</span>');
   if (c.role) tags.push('<span class="char-tag gold">' + esc(c.role) + '</span>');
+  if (c.legacy) tags.push('<span class="char-tag">Legacy/Symbolic</span>');
   if (locked) tags.push('<span class="char-tag teal">Locked</span>');
   if (c.storiesUsed && c.storiesUsed.length) tags.push('<span class="char-tag blue">' + c.storiesUsed.length + ' stories</span>');
+
+  // Story-derived character ids look like "TK-0001-c0" — the trailing
+  // index is which character in that kural's cast this is, used to deep
+  // link straight to that character on character-detail.html.
+  var idxMatch = /-c(\d+)$/.exec(c.id || "");
+  var profileLink = (!c.legacy && c.kuralNumber) ?
+    '<a class="char-card-profile-link" data-no-drawer href="character-detail.html?kural=' + c.kuralNumber + '&c=' + (idxMatch ? idxMatch[1] : 0) + '">Open full profile &rarr;</a>' : "";
 
   return '<div class="char-card' + statusClass + '" data-char-id="' + esc(c.id) + '">' +
     '<div class="char-card-top"><div class="char-avatar">' + initials + '</div><div class="char-card-info">' +
     '<h3 class="char-card-name">' + esc(c.name) + '</h3><span class="char-card-id">' + esc(c.id) + '</span></div></div>' +
     '<div class="char-card-body"><div class="char-card-tags">' + tags.join("") + '</div></div>' +
     '<div class="char-card-footer"><span>Updated: ' + (c.modifiedAt ? c.modifiedAt.slice(0, 10) : '—') + '</span>' +
-    '<span>' + (c.kuralId || "") + '</span></div></div>';
+    '<span>' + (c.kuralId || "") + '</span></div>' + profileLink + '</div>';
 }
 
 function renderGrid(chars) {
@@ -163,11 +130,27 @@ function renderGrid(chars) {
   empty.classList.remove("visible");
   grid.innerHTML = chars.map(renderCard).join("");
   grid.querySelectorAll(".char-card").forEach(function (card) {
-    card.addEventListener("click", function () { openDrawer(card.getAttribute("data-char-id")); });
+    card.addEventListener("click", function (e) {
+      if (e.target.closest("[data-no-drawer]")) return;
+      openDrawer(card.getAttribute("data-char-id"));
+    });
   });
 }
 
-function filterChars() {
+function renderPager(total, totalPages) {
+  var pager = document.getElementById("char-pager");
+  if (!pager) return;
+  if (total === 0) { pager.innerHTML = ""; return; }
+  pager.innerHTML =
+    '<button type="button" class="ui-btn" id="char-page-prev"' + (charPage <= 1 ? " disabled" : "") + '>&larr; Prev</button>' +
+    '<span class="char-pager-info">Page ' + charPage + ' of ' + totalPages + ' &middot; ' + total + ' characters</span>' +
+    '<button type="button" class="ui-btn" id="char-page-next"' + (charPage >= totalPages ? " disabled" : "") + '>Next &rarr;</button>';
+  document.getElementById("char-page-prev")?.addEventListener("click", function () { if (charPage > 1) { charPage--; filterChars(); } });
+  document.getElementById("char-page-next")?.addEventListener("click", function () { if (charPage < totalPages) { charPage++; filterChars(); } });
+}
+
+function filterChars(resetPage) {
+  if (resetPage) charPage = 1;
   var search = (document.getElementById("search-input").value || "").toLowerCase();
   var role = document.getElementById("role-filter").value;
   var gender = document.getElementById("gender-filter").value;
@@ -179,6 +162,7 @@ function filterChars() {
     if (search && !(c.name || "").toLowerCase().includes(search) && !(c.id || "").toLowerCase().includes(search) && !(c.kuralId || "").toLowerCase().includes(search)) return false;
     if (role && c.role !== role) return false;
     if (gender && c.gender !== gender) return false;
+    if (age && c.ageGroup !== age) return false;
     if (status && c.status !== status) return false;
     return true;
   });
@@ -187,7 +171,11 @@ function filterChars() {
   else if (sort === "kural") filtered.sort(function (a, b) { return (a.kuralNumber || 0) - (b.kuralNumber || 0); });
   else filtered.sort(function (a, b) { return (b.modifiedAt || "").localeCompare(a.modifiedAt || ""); });
 
-  renderGrid(filtered);
+  var totalPages = Math.max(1, Math.ceil(filtered.length / CHAR_PAGE_SIZE));
+  if (charPage > totalPages) charPage = totalPages;
+  var pageItems = filtered.slice((charPage - 1) * CHAR_PAGE_SIZE, charPage * CHAR_PAGE_SIZE);
+  renderGrid(pageItems);
+  renderPager(filtered.length, totalPages);
 }
 
 /* ===== DRAWER TABS ===== */
@@ -546,13 +534,17 @@ function initCharacterLibrary() {
   populateFilters();
   filterChars();
 
+  // Deep link from character-detail.html's "Edit in Character Library" button.
+  var openId = new URLSearchParams(window.location.search).get("open");
+  if (openId && getCharById(openId)) openDrawer(openId);
+
   var debounceTimer;
   document.getElementById("search-input").addEventListener("input", function () {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(filterChars, 200);
+    debounceTimer = setTimeout(function () { filterChars(true); }, 200);
   });
   ["role-filter", "gender-filter", "age-filter", "status-filter", "sort-filter"].forEach(function (id) {
-    document.getElementById(id).addEventListener("change", filterChars);
+    document.getElementById(id).addEventListener("change", function () { filterChars(true); });
   });
 
   document.getElementById("add-character-btn").addEventListener("click", handleAddCharacter);
