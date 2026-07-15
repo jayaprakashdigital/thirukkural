@@ -268,6 +268,11 @@ function padScene(kuralNumber, sceneNumber, title, duration, location, character
 /**
  * Deterministically builds a 5-scene script from approved story content.
  * Stands in for the "Generate Script" action in this no-backend prototype.
+ *
+ * Prompt format:
+ * - Image: [Shot type] of [subject] at [location]. [Action/scene]. [Style suffix].
+ * - Video: [N]s [shot type]. [Camera movement]. [Subject action]. [Quality].
+ * Style suffix ensures consistent Tamil-heritage cinematic visuals across scenes.
  */
 function buildScenesFromStory(src) {
   const location = mapLocation(src.location);
@@ -275,32 +280,35 @@ function buildScenesFromStory(src) {
   const secondary = src.characters[1] || "";
   const allCharacters = src.characters.slice();
   const withThiru = allCharacters.concat(["Thiruvalluvar"]);
+  const IMG_STYLE = "cinematic realism, Tamil heritage aesthetic, warm earthy palette, 4K, high detail, professional cinematography";
+  const VID_STYLE = "24fps, color graded, cinematic, smooth motion";
+  const LOC = location.toLowerCase();
 
   return [
     padScene(src.kuralNumber, 1, "The Hook", 8, location, allCharacters,
       src.hook, src.tamilDialogues.slice(0, 1), "Curious", "Wide Shot", "Cut",
-      `Establishing shot of ${location.toLowerCase()} setting, ${protagonist} at the center of the moment described: ${src.hook}`,
-      `8s wide establishing shot. ${src.hook}`),
+      `Wide establishing shot of ${LOC} setting. ${protagonist} at the center of the moment: ${src.hook}. ${IMG_STYLE}.`,
+      `8s wide establishing shot of ${LOC}. Slow dolly-in toward ${protagonist}. Curious, intriguing mood. ${VID_STYLE}.`),
 
     padScene(src.kuralNumber, 2, "Rising Moment", 10, location, allCharacters,
       src.story, src.tamilDialogues.slice(1, 3), "Hope", "Medium", "Cut",
-      `Medium shot of ${protagonist}${secondary ? " and " + secondary : ""} in conversation, ${location.toLowerCase()} setting, warm natural light.`,
-      `10s medium shot dialogue scene between ${protagonist}${secondary ? " and " + secondary : ""}.`),
+      `Medium shot of ${protagonist}${secondary ? " and " + secondary : ""} in conversation at ${LOC} setting. Warm natural light, hopeful mood. ${IMG_STYLE}.`,
+      `10s medium shot dialogue scene between ${protagonist}${secondary ? " and " + secondary : ""} at ${LOC}. Gentle pan, soft over-the-shoulder framing. ${VID_STYLE}.`),
 
     padScene(src.kuralNumber, 3, "The Turning Point", 8, location, allCharacters,
       src.tamilDialogues[3] ? parseDialogueLine(src.tamilDialogues[3]).line : src.story, src.tamilDialogues.slice(3, 4), "Proud", "Close Up", "Cut",
-      `Close up on ${protagonist}'s face at the moment of realization, emotional turning point.`,
-      `8s close up capturing the emotional shift in ${protagonist}.`),
+      `Close up on ${protagonist}'s face at the moment of realization. Emotional turning point, expressive eyes, soft portrait lighting. ${IMG_STYLE}.`,
+      `8s close up capturing the emotional shift in ${protagonist}. Subtle push-in, shallow depth of field. Proud, reflective mood. ${VID_STYLE}.`),
 
     padScene(src.kuralNumber, 4, "Thiruvalluvar's Wisdom", 12, location, withThiru,
       `${src.thiruvalluvarAppears} ${src.thiruvalluvarExplanation}`, [], "Hope", "Top View", "Dissolve",
-      `Thiruvalluvar appears bathed in golden light at ${location.toLowerCase()}, serene sage presence, reverent atmosphere. Kural text overlay: "${src.thirukkural}"`,
-      `12s dissolve transition introducing Thiruvalluvar. Voice-over recites: "${src.thirukkural}" ("${src.englishTranslation}")`),
+      `Thiruvalluvar appears bathed in golden divine light at ${LOC}. Serene sage in white robes, reverent atmosphere, radiant halo. Kural text overlay: "${src.thirukkural}". ${IMG_STYLE}.`,
+      `12s dissolve transition introducing Thiruvalluvar at ${LOC}. Slow crane down to sage, golden hour rays. Voice-over recites: "${src.thirukkural}" ("${src.englishTranslation}"). ${VID_STYLE}.`),
 
     padScene(src.kuralNumber, 5, "The Moral", 7, location, allCharacters,
       src.moral, [], "Happy", "Pan", "Fade",
-      `Wide pan shot closing on ${protagonist}, peaceful resolution, warm golden hour lighting.`,
-      `7s closing pan shot with narration: "${src.moral}" Fade to Thirukkural branding.`)
+      `Wide pan shot closing on ${protagonist} at ${LOC}. Peaceful resolution, warm golden hour lighting, hopeful mood. ${IMG_STYLE}.`,
+      `7s closing pan shot of ${protagonist}. Slow horizontal pan, warm golden hour light. Narration: "${src.moral}". Fade to title card. ${VID_STYLE}.`)
   ];
 }
 

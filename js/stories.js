@@ -636,6 +636,16 @@ const ALL_ROWS = Object.keys(CS)
     };
   });
 
+const PAGE_SIZE = 50;
+let currentPage = 1;
+let currentFiltered = [];
+let currentQuery = "";
+
+function debounce(fn, ms) {
+  let timer;
+  return function (...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
+
 const COLUMNS = [
   { key: "id",    className: "col-id",    label: "ID",
     render: (r) => `<span class="story-id-badge anim-glow">${esc(r.id)}</span>` },
@@ -682,13 +692,29 @@ function renderTable(rows) {
   const head = COLUMNS.map((c) =>
     `<th class="${c.className || ""}">${esc(c.label)}</th>`
   ).join("");
-  const body = rows.map((r) =>
+
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const pageRows = rows.slice(startIdx, startIdx + PAGE_SIZE);
+
+  const body = pageRows.map((r) =>
     `<tr>${COLUMNS.map((c) => `<td class="${c.className || ""}">${c.render(r)}</td>`).join("")}</tr>`
   ).join("");
+
+  const totalPages = Math.ceil(rows.length / PAGE_SIZE);
+  const pagination = totalPages > 1 ? `
+    <div class="pagination" style="display:flex;gap:8px;align-items:center;justify-content:center;padding:12px;flex-wrap:wrap;">
+      <button class="page-btn" data-page="1" ${currentPage === 1 ? "disabled" : ""}>&laquo; First</button>
+      <button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""}>&lsaquo; Prev</button>
+      <span class="page-info">Page ${currentPage} of ${totalPages} (${rows.length} stories)</span>
+      <button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? "disabled" : ""}>Next &rsaquo;</button>
+      <button class="page-btn" data-page="${totalPages}" ${currentPage === totalPages ? "disabled" : ""}>Last &raquo;</button>
+    </div>` : "";
+
   return `<div class="table-scroll"><table>
     <thead><tr>${head}</tr></thead>
     <tbody>${body}</tbody>
-  </table></div>`;
+  </table></div>
+  ${pagination}`;
 }
 
 function filterRows(query) {
@@ -712,12 +738,29 @@ function setStats(count, total, query) {
 }
 
 function updateView(query = "") {
-  const filtered = filterRows(query);
+  currentQuery = query;
+  currentFiltered = filterRows(query);
+  const totalPages = Math.ceil(currentFiltered.length / PAGE_SIZE) || 1;
+  if (currentPage > totalPages) currentPage = 1;
   const content = document.getElementById("content");
-  content.innerHTML = renderTable(filtered);
-  setStats(filtered.length, ALL_ROWS.length, query);
-  content.querySelectorAll(".read-btn").forEach((btn) => {
-    btn.addEventListener("click", () => openModal(parseInt(btn.dataset.id, 10)));
+  content.innerHTML = renderTable(currentFiltered);
+  setStats(currentFiltered.length, ALL_ROWS.length, query);
+}
+
+/* Delegated click handler: one listener for all read buttons + pagination. */
+function initContentEvents() {
+  const content = document.getElementById("content");
+  if (!content || content.dataset.bound === "1") return;
+  content.dataset.bound = "1";
+  content.addEventListener("click", (e) => {
+    const btn = e.target.closest(".read-btn");
+    if (btn) { openModal(parseInt(btn.dataset.id, 10)); return; }
+    const page = e.target.closest(".page-btn");
+    if (page && !page.disabled) {
+      currentPage = parseInt(page.dataset.page, 10);
+      content.innerHTML = renderTable(currentFiltered);
+      content.scrollIntoView({ block: "start" });
+    }
   });
 }
 
@@ -856,11 +899,13 @@ function init() {
   initTheme();
   initSidebar();
   updateView();
+  initContentEvents();
   const search = document.getElementById("search");
   if (search) {
     search.disabled = false;
     search.placeholder = "Search by ID, kural number, theme, chapter, place\u2026";
-    search.addEventListener("input", (e) => updateView(e.target.value));
+    const debouncedSearch = debounce((value) => { currentPage = 1; updateView(value); }, 200);
+    search.addEventListener("input", (e) => debouncedSearch(e.target.value));
   }
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeModal();

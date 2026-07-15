@@ -42,6 +42,11 @@ function buildItems() {
 
 let ALL_ITEMS = [];
 
+function debounce(fn, ms) {
+  let timer;
+  return function (...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
+
 function esc(s) {
   return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
@@ -185,7 +190,7 @@ function initLibrary() {
   ALL_ITEMS = buildItems();
   filterLibrary();
 
-  document.getElementById("search-input")?.addEventListener("input", filterLibrary);
+  document.getElementById("search-input")?.addEventListener("input", debounce(filterLibrary, 200));
   document.getElementById("status-filter")?.addEventListener("change", filterLibrary);
   document.getElementById("sort-filter")?.addEventListener("change", filterLibrary);
 

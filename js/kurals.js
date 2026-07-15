@@ -161,11 +161,18 @@ const COLUMNS = [
    Data helpers
    ============================================================ */
 let allRows = [];
+const PAGE_SIZE = 50;
+let currentPage = 1;
+let currentFiltered = [];
+let currentQuery = "";
+
+function debounce(fn, ms) {
+  let timer;
+  return function (...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
 
 function esc(text) {
-  const d = document.createElement("div");
-  d.textContent = text ?? "";
-  return d.innerHTML;
+  return String(text ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function commentaryCell(label, text) {
@@ -196,12 +203,16 @@ function buildChapterMap(detail) {
 }
 
 function mergeData(kurals, chapterMap) {
-  return kurals.map((k) => ({
-    ...k,
-    ...(chapterMap[k.Number] || {
-      paal: "", paalEn: "", iyal: "", iyalEn: "", adhigaram: "", adhigaramEn: "",
-    }),
-  }));
+  return kurals.map((k) => {
+    const merged = {
+      ...k,
+      ...(chapterMap[k.Number] || {
+        paal: "", paalEn: "", iyal: "", iyalEn: "", adhigaram: "", adhigaramEn: "",
+      }),
+    };
+    merged._search = searchableText(merged);
+    return merged;
+  });
 }
 
 function cellHtml(col, row) {
@@ -226,7 +237,7 @@ function renderTable(rows) {
     return `
       <div class="kurals-state">
         <div class="kurals-empty">
-          <div class="kurals-empty-icon">🔍</div>
+          <div class="kurals-empty-icon">No matches</div>
           <p>No kurals match your search.</p>
         </div>
       </div>`;
@@ -236,12 +247,25 @@ function renderTable(rows) {
     `<th class="${c.className || ""}">${esc(c.label)}</th>`
   ).join("");
 
-  const body = rows.map((row) => {
+  const startIdx = (currentPage - 1) * PAGE_SIZE;
+  const pageRows = rows.slice(startIdx, startIdx + PAGE_SIZE);
+
+  const body = pageRows.map((row) => {
     const cells = COLUMNS.map((c) =>
       `<td class="${c.className || ""}">${cellHtml(c, row)}</td>`
     ).join("");
     return `<tr data-kural-id="${kuralId(row.Number)}">${cells}</tr>`;
   }).join("");
+
+  const totalPages = Math.ceil(rows.length / PAGE_SIZE);
+  const pagination = totalPages > 1 ? `
+    <div class="pagination" style="display:flex;gap:8px;align-items:center;justify-content:center;padding:12px;flex-wrap:wrap;">
+      <button class="page-btn" data-page="1" ${currentPage === 1 ? "disabled" : ""}>&laquo; First</button>
+      <button class="page-btn" data-page="${currentPage - 1}" ${currentPage === 1 ? "disabled" : ""}>&lsaquo; Prev</button>
+      <span class="page-info">Page ${currentPage} of ${totalPages} (${rows.length} kurals)</span>
+      <button class="page-btn" data-page="${currentPage + 1}" ${currentPage === totalPages ? "disabled" : ""}>Next &rsaquo;</button>
+      <button class="page-btn" data-page="${totalPages}" ${currentPage === totalPages ? "disabled" : ""}>Last &raquo;</button>
+    </div>` : "";
 
   return `
     <div class="table-scroll">
@@ -249,12 +273,13 @@ function renderTable(rows) {
         <thead><tr>${head}</tr></thead>
         <tbody>${body}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${pagination}`;
 }
 
 function filterRows(query) {
   const q = query.trim().toLowerCase();
-  return q ? allRows.filter((row) => searchableText(row).includes(q)) : allRows;
+  return q ? allRows.filter((row) => row._search.includes(q)) : allRows;
 }
 
 function setStats(count, total, query) {
@@ -266,9 +291,12 @@ function setStats(count, total, query) {
 }
 
 function updateView(query = "") {
-  const filtered = filterRows(query);
-  document.getElementById("content").innerHTML = renderTable(filtered);
-  setStats(filtered.length, allRows.length, query);
+  currentQuery = query;
+  currentFiltered = filterRows(query);
+  const totalPages = Math.ceil(currentFiltered.length / PAGE_SIZE) || 1;
+  if (currentPage > totalPages) currentPage = 1;
+  document.getElementById("content").innerHTML = renderTable(currentFiltered);
+  setStats(currentFiltered.length, allRows.length, query);
 }
 
 function showError(msg) {
@@ -300,7 +328,15 @@ async function initData() {
     const search = document.getElementById("search");
     search.disabled = false;
     search.focus?.();
-    search.addEventListener("input", (e) => updateView(e.target.value));
+    const debouncedSearch = debounce((value) => { currentPage = 1; updateView(value); }, 200);
+    search.addEventListener("input", (e) => debouncedSearch(e.target.value));
+
+    document.getElementById("content").addEventListener("click", (e) => {
+      const btn = e.target.closest(".page-btn");
+      if (!btn || btn.disabled) return;
+      currentPage = parseInt(btn.dataset.page, 10);
+      document.getElementById("content").innerHTML = renderTable(currentFiltered);
+    });
   } catch {
     showError(`
       Could not load data. Open this page through a local web server.<br><br>

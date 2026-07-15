@@ -1,0 +1,39 @@
+# Thirukkural — local / VPS stack via Docker Compose.
+# Usage:
+#   1. cp .env.example .env  &&  fill in WEBHOOK_SECRET
+#   2. docker compose up -d --build
+#
+# Services:
+#   web     — nginx serving the static site on :80, proxies webhook -> webhook:3600
+#   webhook — Node server receiving GitHub push events and deploying on master
+
+services:
+  web:
+    image: nginx:alpine
+    container_name: thirukkural-web
+    ports:
+      - "80:80"
+    volumes:
+      # Static site (read-only so the container never mutates source).
+      - ./:/usr/share/nginx/html:ro
+      # nginx site config.
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - webhook
+    restart: unless-stopped
+
+  webhook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thirukkural-webhook
+    environment:
+      # WEBHOOK_SECRET is required and read from the host .env file.
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET:?WEBHOOK_SECRET must be set in .env}
+      - PORT=3600
+      - REPO_PATH=/repo
+      - LOG_FILE=/var/log/thirukkural-deploy.log
+    volumes:
+      # Read-write mount so the webhook can `git fetch` / `git reset --hard`.
+      - ./:/repo
+    restart: unless-stopped

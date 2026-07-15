@@ -4,14 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Script Detail — AI Content Studio</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Noto+Sans+Tamil:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
-  <link rel="stylesheet" href="css/components.css?v=3">
-  <link rel="stylesheet" href="css/dashboard.css?v=3">
-  <link rel="stylesheet" href="css/prompts.css">
-  <link rel="stylesheet" href="css/script-detail.css">
+  <link rel="stylesheet" href="css/styles.css?v=5">
+  <link rel="stylesheet" href="css/components.css?v=5">
+  <link rel="stylesheet" href="css/dashboard.css?v=5">
+  <link rel="stylesheet" href="css/prompts.css?v=5">
+  <link rel="stylesheet" href="css/script-detail.css?v=5">
   <script>
     (function () {
       var t = localStorage.getItem("thirukkural-theme") || "dark";
@@ -136,6 +137,56 @@
           </div>
         </section>
 
+        <!-- Production Dashboard (Session 02) -->
+        <section class="ui-card sd-prod-dashboard">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Production Dashboard</h2>
+            <span class="ui-card-subtitle">Script progress &amp; validation</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="sd-prod-grid" id="sd-prod-grid"></div>
+          </div>
+        </section>
+
+        <!-- Scene Validation (Session 15+16) -->
+        <section class="ui-card sd-validation-section">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Script Validation</h2>
+            <span class="ui-card-subtitle">AI readiness across all scenes</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="sd-validation-summary" id="sd-validation-summary"></div>
+            <div class="sd-validation-scenes" id="sd-validation-scenes"></div>
+          </div>
+        </section>
+
+        <!-- AI Workflow (Session 18) -->
+        <section class="ui-card sd-workflow-section">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">AI Production Workflow</h2>
+            <span class="ui-card-subtitle">Story &rarr; Scenes &rarr; Prompts &rarr; Image &rarr; Video &rarr; Voice &rarr; Assets &rarr; Publishing</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="sd-workflow-track" id="sd-workflow-track"></div>
+          </div>
+        </section>
+
+        <!-- Export Center (Session 17) -->
+        <section class="ui-card sd-export-section">
+          <div class="ui-card-header">
+            <h2 class="ui-card-title">Export Center</h2>
+            <span class="ui-card-subtitle">Export script data for downstream production</span>
+          </div>
+          <div class="ui-card-body">
+            <div class="sd-export-grid">
+              <button type="button" class="ui-btn" id="export-json-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export JSON</button>
+              <button type="button" class="ui-btn" id="export-md-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Markdown</button>
+              <button type="button" class="ui-btn" id="export-script-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Export Script</button>
+              <button type="button" class="ui-btn" id="copy-json-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy JSON</button>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
@@ -144,15 +195,16 @@
   <div class="prompt-modal" id="scene-editor-modal">
     <div class="modal-overlay" id="scene-modal-overlay"></div>
     <div class="modal-content scene-editor-content">
-      <button type="button" class="modal-close" id="scene-modal-close">
+      <button type="button" class="modal-close" id="scene-modal-close" aria-label="Close editor">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       <div id="scene-editor-body" class="modal-body"></div>
     </div>
   </div>
 
-  <script src="js/dashboard.js?v=4"></script>
-  <script src="js/scripts-data.js"></script>
-  <script src="js/script-detail.js"></script>
+  <script src="js/shared.js?v=1"></script>
+<script src="js/dashboard.js?v=5"></script>
+  <script src="js/scripts-data.js?v=5"></script>
+  <script src="js/script-detail.js?v=6"></script>
 </body>
 </html>

@@ -1,1 +1,26 @@
+# Dependencies
 node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+/var/log/
+
+# OS / editor artifacts
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build / coverage output
+dist/
+build/
+coverage/
+.cache/

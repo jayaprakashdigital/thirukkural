@@ -85,6 +85,11 @@ function buildPost(k) {
 
 let ALL_POSTS = [];
 
+function debounce(fn, ms) {
+  let timer;
+  return function (...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
+
 function renderPostRow(p) {
   const platformBadges = SOCIAL_PLATFORMS.map(
     (pl) => `<span class="platform-chip platform-${pl.key}" title="${pl.label}">${pl.short}</span>`
@@ -253,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderPostsTable(ALL_POSTS);
   updateSocialStats();
 
-  document.getElementById("search-input")?.addEventListener("input", filterPosts);
+  document.getElementById("search-input")?.addEventListener("input", debounce(filterPosts, 200));
   document.getElementById("section-filter")?.addEventListener("change", filterPosts);
   document.getElementById("status-filter")?.addEventListener("change", filterPosts);
   document.getElementById("sort-filter")?.addEventListener("change", filterPosts);

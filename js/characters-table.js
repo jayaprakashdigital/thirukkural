@@ -79,6 +79,11 @@ function showToast(message) {
 // ===== CHARACTER TABLE LOGIC =====
 let allCharactersCache = [];
 
+function debounce(fn, ms) {
+  let timer;
+  return function (...args) { clearTimeout(timer); timer = setTimeout(() => fn.apply(this, args), ms); };
+}
+
 function buildAllCharactersList() {
   const result = [];
 
@@ -153,15 +158,19 @@ function renderCharacterTable(characters) {
 
   tbody.innerHTML = characters.map(char => renderCharacterRow(char)).join("");
   countEl.textContent = `${characters.length} record${characters.length !== 1 ? 's' : ''}`;
+}
 
-  // Add event listeners
-  tbody.querySelectorAll(".view-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const charId = btn.getAttribute("data-char-id");
-      const character = allCharactersCache.find(c => c.id === charId);
-      if (character) showCharacterDetail(character);
-    });
+/* Delegated click handler: one listener on the tbody instead of one per row. */
+function bindTableEvents() {
+  const tbody = document.getElementById("table-body");
+  if (!tbody || tbody.dataset.bound === "1") return;
+  tbody.dataset.bound = "1";
+  tbody.addEventListener("click", (e) => {
+    const btn = e.target.closest(".view-btn");
+    if (!btn) return;
+    const charId = btn.getAttribute("data-char-id");
+    const character = allCharactersCache.find(c => c.id === charId);
+    if (character) showCharacterDetail(character);
   });
 }
 
@@ -278,10 +287,12 @@ function initCharacterTable() {
   const storyChars = allCharactersCache.filter(c => c.story).length;
   updateStats(totalChars, kuralsWithChars, storyChars);
 
-  document.getElementById("search-input")?.addEventListener("input", filterCharacters);
+  document.getElementById("search-input")?.addEventListener("input", debounce(filterCharacters, 200));
   document.getElementById("gender-filter")?.addEventListener("change", filterCharacters);
   document.getElementById("story-filter")?.addEventListener("change", filterCharacters);
   document.getElementById("sort-filter")?.addEventListener("change", filterCharacters);
+
+  bindTableEvents();
 
   document.getElementById("export-btn")?.addEventListener("click", () => {
     // Export as CSV

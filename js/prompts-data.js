@@ -27,7 +27,9 @@ This opening kural of Thirukkural establishes the fundamental principle that jus
 The kural teaches that acknowledging the Divine as the source of all existence is the beginning of wisdom. Before pursuing virtue, wealth, or love, one must recognize the eternal nature of the Divine. This is not mere religious sentiment but a fundamental principle of existence - that consciousness, creation, and continuity all stem from one ultimate source.`,
     imagePrompt: `A sacred Tamil temple with golden gopuram (tower) reaching toward the sky with divine light rays. Ancient Tamil script glowing in golden letters. "Akara" (letter A) in Tamil script radiating light and creating all other letters and words. Ethereal divine presence represented by cosmic light. Serene, spiritual, deeply reverent mood. High quality, cinematic lighting.`,
     characterPrompt: `Thiruvalluvar - elderly sage in traditional white Tamil robes, with kind eyes and a serene expression. Depicted sitting in a contemplative pose, surrounded by sacred light. His presence radiates wisdom and divine connection.`,
-    videoPrompt: `60 seconds. Opening sequence with cosmic creation: swirling cosmic dust forming into galaxies. Gradually transition to earth and Tamil temples. Camera moves through temple corridors toward the sanctum. Show the letter 'Akara' in Tamil script glowing and transforming into all other letters. Images of creation - sunrise, trees growing, rivers flowing, life emerging. Gentle, meditative background music. Slow, reverent camera movements. Narrator voice: wise, gentle, authoritative but not harsh.`,
+    stylePrompt: `cinematic realism, Tamil heritage aesthetic, warm earthy palette, 4K, high detail, professional cinematography`,
+    negativePrompt: `blurry, low quality, distorted faces, extra limbs, watermark, text artifacts, oversaturated`,
+    videoPrompt: `60 seconds. Opening sequence with cosmic creation: swirling cosmic dust forming into galaxies. Gradually transition to earth and Tamil temples. Camera moves through temple corridors toward the sanctum. Show the letter 'Akara' in Tamil script glowing and transforming into all other letters. Images of creation - sunrise, trees growing, rivers flowing, life emerging. Gentle, meditative background music. Slow, reverent camera movements. Narrator voice: wise, gentle, authoritative but not harsh. 24fps, color graded, cinematic.`,
     narrationScript: `"In the beginning, there is the Divine. Just as the letter 'A' is the foundation of all letters, God is the foundation of all creation. This is the eternal truth that guides us."`,
     keyPoints: [
       "Divine is the source of all existence",
@@ -153,8 +155,13 @@ function getTotalPromptCount() {
   return Object.keys(PROMPTS_DATABASE).length;
 }
 
-// Helper function to create a prompt template for new kurals
+// Helper function to create a prompt template for new kurals.
+// Template fields use [BRACKETED] placeholders — replace with kural-specific content.
+// Style suffix ensures consistent Tamil-heritage visuals across all generated assets.
 function createPromptTemplate(kuralNumber, kuralId, title, story = "", storyId = "", category = "General") {
+  var IMG_STYLE = "cinematic realism, Tamil heritage aesthetic, warm earthy palette, 4K, high detail, professional cinematography";
+  var VID_STYLE = "24fps, color graded, cinematic, smooth motion";
+  var NEGATIVE = "blurry, low quality, distorted faces, extra limbs, watermark, text artifacts, oversaturated";
   return {
     kuralNumber: kuralNumber,
     kuralId: kuralId,
@@ -162,24 +169,25 @@ function createPromptTemplate(kuralNumber, kuralId, title, story = "", storyId =
     story: story,
     storyId: storyId,
     category: category,
-    scriptText: "Script content here...",
+    scriptText: `Kural ${kuralId}: "${title}"\n\n[Tamil kural text]\n\n[English translation]\n\n[2-3 sentence narration explaining the kural's meaning and its relevance to daily life]`,
     timing: {
       intro: "0:00-0:05",
       mainNarration: "0:05-0:20",
       explanation: "0:20-0:30",
       outro: "0:30-0:35"
     },
-    detailedExplanation: "Detailed explanation here...",
-    imagePrompt: "Image generation prompt here...",
-    characterPrompt: "Character description here...",
-    videoPrompt: "Video generation prompt here...",
-    narrationScript: "Narration script here...",
+    detailedExplanation: `[Paragraph 1: Literal meaning of the kural]\n\n[Paragraph 2: Philosophical significance and cultural context]\n\n[Paragraph 3: Modern relevance and practical application]`,
+    imagePrompt: `[Main subject]. [Setting/location]. [Mood/atmosphere]. Style: ${IMG_STYLE}. Negative: ${NEGATIVE}.`,
+    characterPrompt: `Characters: [list]. Expression: [emotion]. Costume: [attire]. Setting: [location]. Detailed features, portrait lighting, sharp focus, ${IMG_STYLE}.`,
+    videoPrompt: `[N]s [shot type] of [subject] at [location]. [Camera movement]. [Lighting/mood]. Narration: "[script]". ${VID_STYLE}.`,
+    narrationScript: `"[Opening hook]. [Main teaching]. [Closing reflection]"`,
     keyPoints: [
-      "Key point 1",
-      "Key point 2",
-      "Key point 3"
+      "[Core teaching 1]",
+      "[Core teaching 2]",
+      "[Core teaching 3]",
+      "[Modern application]"
     ],
-    generationNotes: "Notes for image/character/video generation..."
+    generationNotes: `Image: [visual approach and key symbols]. Character: [who to depict and how]. Video: [sequence, transitions, camera moves]. Audio: [mood and instrument choices].`
   };
 }
 
