@@ -322,31 +322,46 @@
     // CHARACTER TABLE LOGIC
     let allCharactersCache = [];
 
-    function buildAllCharactersList() {
-      const result = [];
-
-      for (let n = 1; n <= 1330; n++) {
-        if (typeof deriveKuralCharacters !== 'function') continue;
-        var chars = deriveKuralCharacters(n);
-        if (!chars || !chars.length) continue;
-        chars.forEach(function(c) {
-          result.push({
-            id: c.id || (n + '-1-' + c.name.toLowerCase().replace(/\s+/g, '-')),
-            name: c.name || 'Character for Kural ' + n,
-            transliteration: c.transliteration || '',
-            gender: c.gender || 'Gender-neutral',
-            role: c.role || '',
-            consistency: c.consistency || 'Story-derived',
-            details: c.description || '',
-            story: (c.storyContext && c.storyContext.title) || '',
-            storyId: '',
-            kuralNumber: n,
-            kuralId: 'TK-' + String(n).padStart(4, '0')
-          });
+    function processKuralChars(n, result) {
+      if (typeof deriveKuralCharacters !== 'function') return;
+      var chars = deriveKuralCharacters(n);
+      if (!chars || !chars.length) return;
+      chars.forEach(function(c) {
+        result.push({
+          id: c.id || (n + '-1-' + c.name.toLowerCase().replace(/s+/g, '-')),
+          name: c.name || 'Character for Kural ' + n,
+          transliteration: c.transliteration || '',
+          gender: c.gender || 'Gender-neutral',
+          role: c.role || '',
+          consistency: c.consistency || 'Story-derived',
+          details: c.description || '',
+          story: (c.storyContext && c.storyContext.title) || '',
+          storyId: '',
+          kuralNumber: n,
+          kuralId: 'TK-' + String(n).padStart(4, '0')
         });
+      });
+    }
+
+    function buildAllCharactersList(callback) {
+      var result = [];
+      var index = 1;
+      var CHUNK = 100;
+
+      function processChunk() {
+        var end = Math.min(index + CHUNK, 1331);
+        for (; index < end; index++) {
+          processKuralChars(index, result);
+        }
+        if (index <= 1330) {
+          setTimeout(processChunk, 0);
+        } else {
+          result.sort(function(a, b) { return a.kuralNumber - b.kuralNumber; });
+          callback(result);
+        }
       }
 
-      return result.sort(function(a, b) { return a.kuralNumber - b.kuralNumber; });
+      setTimeout(processChunk, 0);
     }
 
     function renderCharacterRow(character) {
@@ -510,13 +525,17 @@
     }
 
     function initCharacterTable() {
-      allCharactersCache = buildAllCharactersList();
-      renderCharacterTable(allCharactersCache);
-
-      const totalChars = allCharactersCache.length;
-      const kuralsWithChars = new Set(allCharactersCache.map(c => c.kuralNumber)).size;
-      const storyChars = allCharactersCache.filter(c => c.story).length;
-      updateStats(totalChars, kuralsWithChars, storyChars);
+      allCharactersCache = [];
+      renderCharacterTable([]);
+      updateStats(0, 0, 0);
+      buildAllCharactersList(function(result) {
+        allCharactersCache = result;
+        renderCharacterTable(result);
+        var totalChars = result.length;
+        var kuralsWithChars = new Set(result.map(function(c) { return c.kuralNumber; })).size;
+        var storyChars = result.filter(function(c) { return c.story; }).length;
+        updateStats(totalChars, kuralsWithChars, storyChars);
+      });
 
       document.getElementById("search-input")?.addEventListener("input", filterCharacters);
       document.getElementById("gender-filter")?.addEventListener("change", filterCharacters);
