@@ -168,18 +168,10 @@
     </div>
   </div>
 
+  <script src="js/kural-characters.js?v=1"></script>
+  <script src="js/characters-data.js?v=4"></script>
+  <script src="js/character-derive.js?v=1"></script>
   <script>
-    // COMPLETE CHARACTER DATABASE - ALL 1330 KURALS
-    const COMPREHENSIVE_CHARACTER_DATABASE = {
-      1: [{id:"1-1-god",name:"The Supreme Being",transliteration:"Paramatman",gender:"Divine",role:"Creator",consistency:"Eternal source of all",details:"The Divine that precedes all creation and gives meaning to existence",story:"Praise of God",storyId:"story-1"}],
-      2: [{id:"2-1-wisdom",name:"Pure Knowledge",transliteration:"Ariven",gender:"Divine",role:"Wisdom Source",consistency:"All-knowing consciousness",details:"The embodiment of all knowledge and understanding",story:"Praise of God",storyId:"story-1"}],
-      3: [{id:"3-1-divine",name:"The Lotus Dweller",transliteration:"Malarmisai",gender:"Divine",role:"Transcendent",consistency:"Beyond comprehension",details:"Dwells in the lotus of devoted hearts",story:"Praise of God",storyId:"story-1"}],
-      4: [{id:"4-1-divine",name:"The Unattached",transliteration:"Veendum",gender:"Divine",role:"Supreme",consistency:"Free from desire",details:"Indifferent to worldly desires, pure consciousness",story:"Praise of God",storyId:"story-1"}],
-      5: [{id:"5-1-seeker",name:"The Humble Seeker",transliteration:"Padaimai",gender:"Gender-neutral",role:"Devotee",consistency:"Spiritual aspirant",details:"One who humbly seeks divine wisdom",story:"Praise of God",storyId:"story-1"}],
-      6: [{id:"6-1-creator",name:"The Primordial",transliteration:"Aadiyan",gender:"Divine",role:"First Cause",consistency:"Origin of all",details:"The beginning and source of all existence",story:"Praise of God",storyId:"story-1"}],
-      7: [{id:"7-1-worshipper",name:"The Devoted",transliteration:"Anbudan",gender:"Gender-neutral",role:"Believer",consistency:"Constant in faith",details:"One devoted to the worship of the Divine",story:"Praise of God",storyId:"story-1"}],
-      8: [{id:"8-1-learned",name:"The Wise Scholar",transliteration:"Kavivar",gender:"Male",role:"Sage",consistency:"Seeker of truth",details:"One who through learning comes to recognize the Divine",story:"Praise of God",storyId:"story-1"}],
-      9: [{id:"9-1-virtuous",name:"The Righteous",transliteration:"Arulvan",gender:"Gender-neutral",role:"Virtuous one",consistency:"Follower of dharma",details:"One who lives in alignment with divine principles",story:"Praise of God",storyId:"story-1"}],
       10: [{id:"10-1-blessed",name:"The Blessed",transliteration:"Ananathan",gender:"Gender-neutral",role:"Fortunate soul",consistency:"Receiver of grace",details:"One who has received the blessing of divine recognition",story:"Praise of God",storyId:"story-1"}],
       11: [{id:"11-1-rain",name:"The Divine Rain",transliteration:"Vaan Mazhai",gender:"Divine",role:"Life-giver",consistency:"Sustainer of all",details:"The blessing that falls from heaven to nourish earth",story:"The Blessing of Rain",storyId:"story-2"}],
       12: [{id:"12-1-earth",name:"The Fertile Earth",transliteration:"Nilam",gender:"Feminine",role:"Provider",consistency:"Life-sustaining",details:"Receives the rain and produces abundance",story:"The Blessing of Rain",storyId:"story-2"}],
@@ -188,85 +180,7 @@
       15: [{id:"15-1-cloud",name:"The Merciful Cloud",transliteration:"Megam",gender:"Gender-neutral",role:"Messenger",consistency:"Divine carrier",details:"Carries rain from heaven to bless the earth",story:"The Blessing of Rain",storyId:"story-2"}],
       16: [{id:"16-1-river",name:"The Flowing River",transliteration:"Aaru",gender:"Feminine",role:"Life source",consistency:"Water carrier",details:"Rivers filled by rain, sustaining all life",story:"The Blessing of Rain",storyId:"story-2"}],
       17: [{id:"17-1-vegetation",name:"Green Plants",transliteration:"Karaikal",gender:"Gender-neutral",role:"Life indicator",consistency:"Growth symbol",details:"Vegetation that springs up after rain",story:"The Blessing of Rain",storyId:"story-2"}],
-      18: [{id:"18-1-livestock",name:"The Animals",transliteration:"Pasu",gender:"Gender-neutral",role:"Dependent creatures",consistency:"Life that depends",details:"Animals that depend on rain and vegetation",story:"The Blessing of Rain",storyId:"story-2"}],
-      19: [{id:"19-1-merchant",name:"The Merchant",transliteration:"Vaanigar",gender:"Male",role:"Trader",consistency:"Commerce dependent",details:"One whose livelihood depends on agricultural abundance",story:"The Blessing of Rain",storyId:"story-2"}],
-      20: [{id:"20-1-thankful",name:"The Grateful",transliteration:"Nanri Solan",gender:"Gender-neutral",role:"Appreciative",consistency:"Blessed receiver",details:"One who gives thanks for the blessing of rain",story:"The Blessing of Rain",storyId:"story-2"}],
-      21: [{id:"21-1-ascetic",name:"The Enlightened Ascetic",transliteration:"Needhaar",gender:"Male",role:"Renunciate",consistency:"Transcender of desires",details:"One who has renounced worldly attachments for wisdom",story:"",storyId:""}],
-      22: [{id:"22-1-virtue",name:"The Path of Virtue",transliteration:"Aram",gender:"Gender-neutral",role:"Principle",consistency:"Eternal truth",details:"The way of righteousness followed by ascetics",story:"",storyId:""}],
-      23: [{id:"23-1-sage",name:"The Wise One",transliteration:"Arivalaar",gender:"Male",role:"Knower",consistency:"Enlightened being",details:"One who has transcended worldly desires through wisdom",story:"",storyId:""}],
-      24: [{id:"24-1-renunciate",name:"The Renouncer",transliteration:"Thumpiyavan",gender:"Male",role:"Ascetic",consistency:"Detached soul",details:"One who has given up worldly pursuits for spiritual truth",story:"",storyId:""}],
-      25: [{id:"25-1-peaceful",name:"The Peaceful",transliteration:"Santi",gender:"Gender-neutral",role:"Serene one",consistency:"Undisturbed mind",details:"One who has achieved inner peace through renunciation",story:"",storyId:""}],
-      26: [{id:"26-1-knower",name:"The Self-Knower",transliteration:"Atmai Arivaan",gender:"Gender-neutral",role:"Enlightened",consistency:"Self-realized",details:"One who knows the true nature of self",story:"",storyId:""}],
-      27: [{id:"27-1-free",name:"The Liberated",transliteration:"Vidhaiyaan",gender:"Gender-neutral",role:"Free being",consistency:"Released from bondage",details:"One freed from the cycle of birth and death",story:"",storyId:""}],
-      28: [{id:"28-1-compassionate",name:"The Compassionate",transliteration:"Vatsalya",gender:"Gender-neutral",role:"Merciful being",consistency:"Love for all",details:"One filled with compassion for all creatures",story:"",storyId:""}],
-      29: [{id:"29-1-truthful",name:"The Truth-Speaker",transliteration:"Satyavaan",gender:"Male",role:"Truthful one",consistency:"Adherent to truth",details:"One who always speaks and lives in truth",story:"",storyId:""}],
-      30: [{id:"30-1-eternal",name:"The Eternal Seeker",transliteration:"Nithya Arivaan",gender:"Gender-neutral",role:"Forever learner",consistency:"Perpetual student",details:"One eternally seeking higher knowledge and truth",story:"",storyId:""}],
-      31: [{id:"31-1-virtuous",name:"The Virtuous Leader",transliteration:"Aravan",gender:"Male",role:"Guide",consistency:"Upholder of dharma",details:"One who asserts and practices virtue in all situations",story:"",storyId:""}],
-      32: [{id:"32-1-strength",name:"The Strength of Virtue",transliteration:"Arai Sakthi",gender:"Gender-neutral",role:"Force",consistency:"Moral power",details:"The inner strength that comes from virtue",story:"",storyId:""}],
-      33: [{id:"33-1-protector",name:"The Protector",transliteration:"Rakshakar",gender:"Male",role:"Guardian",consistency:"Defender of righteousness",details:"One who protects virtue and those who follow it",story:"",storyId:""}],
-      34: [{id:"34-1-firm",name:"The Steadfast",transliteration:"Ninaivilla",gender:"Gender-neutral",role:"Unwavering",consistency:"Constant in virtue",details:"One who never wavers from the path of virtue",story:"",storyId:""}],
-      35: [{id:"35-1-triumphant",name:"The Victorious",transliteration:"Jayavan",gender:"Male",role:"Winner",consistency:"Successful in virtue",details:"One whose virtuous life leads to ultimate triumph",story:"",storyId:""}],
-      36: [{id:"36-1-honored",name:"The Honored",transliteration:"Maryavaanan",gender:"Male",role:"Esteemed",consistency:"Respected for virtue",details:"One honored by society for virtuous conduct",story:"",storyId:""}],
-      37: [{id:"37-1-trustworthy",name:"The Trustworthy",transliteration:"Vishvasa Purvaan",gender:"Gender-neutral",role:"Reliable",consistency:"Dependable character",details:"One whose virtue makes them trustworthy",story:"",storyId:""}],
-      38: [{id:"38-1-noble",name:"The Noble One",transliteration:"Arya",gender:"Gender-neutral",role:"Highborn spirit",consistency:"Elevated character",details:"One of noble character and virtuous conduct",story:"",storyId:""}],
-      39: [{id:"39-1-wise",name:"The Virtuous Sage",transliteration:"Karvi",gender:"Male",role:"Wise being",consistency:"Knower of right",details:"One who wisely practices and teaches virtue",story:"",storyId:""}],
-      40: [{id:"40-1-ideal",name:"The Ideal",transliteration:"Nirmalan",gender:"Gender-neutral",role:"Perfect example",consistency:"Pure being",details:"One who embodies all virtues perfectly",story:"",storyId:""}],
-      41: [{id:"41-1-householder",name:"The Wise Householder",transliteration:"Ilaravan",gender:"Male",role:"Family head",consistency:"Keeper of home",details:"One who manages household with virtue and wisdom",story:"",storyId:""}],
-      42: [{id:"42-1-wife",name:"The Devoted Wife",transliteration:"Manaivi",gender:"Female",role:"Life partner",consistency:"Home pillar",details:"One whose virtue strengthens the household",story:"",storyId:""}],
-      43: [{id:"43-1-children",name:"The Children",transliteration:"Pillai",gender:"Gender-neutral",role:"Young ones",consistency:"Future generation",details:"Offspring who continue the family legacy",story:"",storyId:""}],
-      44: [{id:"44-1-elder",name:"The Elder",transliteration:"Thazhainaar",gender:"Gender-neutral",role:"Senior",consistency:"Wisdom source",details:"Aged members whose experience guides the family",story:"",storyId:""}],
-      45: [{id:"45-1-harmony",name:"Family Harmony",transliteration:"Samadhi",gender:"Gender-neutral",role:"Balance",consistency:"Unity symbol",details:"The peaceful state of a well-managed household",story:"",storyId:""}],
-      46: [{id:"46-1-provider",name:"The Provider",transliteration:"Kavalkai",gender:"Male",role:"Sustainer",consistency:"Nourisher",details:"One who provides sustenance for the family",story:"",storyId:""}],
-      47: [{id:"47-1-caregiver",name:"The Caregiver",transliteration:"Pallikal",gender:"Female",role:"Nurturer",consistency:"Comforter",details:"One who cares for family members with love",story:"",storyId:""}],
-      48: [{id:"48-1-mediator",name:"The Mediator",transliteration:"Samaikal",gender:"Gender-neutral",role:"Peacemaker",consistency:"Resolver",details:"One who maintains peace in family disputes",story:"",storyId:""}],
-      49: [{id:"49-1-teacher",name:"The Teacher",transliteration:"Kalviyalan",gender:"Male",role:"Educator",consistency:"Guide",details:"One who teaches values and knowledge to family",story:"",storyId:""}],
-      50: [{id:"50-1-protector",name:"The Home Protector",transliteration:"Nil Rakshakar",gender:"Male",role:"Defender",consistency:"Safe guardian",details:"One who protects family and household from harm",story:"",storyId:""}],
-      51: [{id:"51-1-perfect-companion",name:"The Perfect Companion",transliteration:"Thunai",gender:"Female",role:"Partner",consistency:"Equal in virtue",details:"A spouse who doubles the household wealth through wisdom",story:"",storyId:""}],
-      52: [{id:"52-1-responsible-husband",name:"The Responsible Husband",transliteration:"Kathalin",gender:"Male",role:"Provider",consistency:"Protector",details:"One whose care for spouse ensures family happiness",story:"",storyId:""}],
-      53: [{id:"53-1-supporter",name:"The Supporter",transliteration:"Thozhil Kalarai",gender:"Female",role:"Helper",consistency:"Cooperative",details:"One who assists husband in all endeavors",story:"",storyId:""}],
-      54: [{id:"54-1-intelligent-wife",name:"The Intelligent Wife",transliteration:"Budhhimati",gender:"Female",role:"Wise woman",consistency:"Advisor",details:"One whose wisdom guides household decisions",story:"",storyId:""}],
-      55: [{id:"55-1-fertile-marriage",name:"Fruitful Marriage",transliteration:"Putra Kalai",gender:"Gender-neutral",role:"Union",consistency:"Blessed bond",details:"A marriage that produces virtuous offspring",story:"",storyId:""}],
-      56: [{id:"56-1-devoted-couple",name:"The Devoted Couple",transliteration:"Anbu Pair",gender:"Gender-neutral",role:"Partners",consistency:"United souls",details:"Two souls united in love and virtue",story:"",storyId:""}],
-      57: [{id:"57-1-worthy-pair",name:"The Worthy Pair",transliteration:"Neelvan Pair",gender:"Gender-neutral",role:"Noble couple",consistency:"Virtuous unit",details:"Husband and wife both virtuous and honorable",story:"",storyId:""}],
-      58: [{id:"58-1-stable-marriage",name:"Stable Marriage",transliteration:"Nithya Sambandham",gender:"Gender-neutral",role:"Union",consistency:"Lasting bond",details:"A marriage founded on virtue and mutual respect",story:"",storyId:""}],
-      59: [{id:"59-1-life-partner",name:"Life Partner",transliteration:"Vaalkai Thunai",gender:"Gender-neutral",role:"Companion",consistency:"Eternal mate",details:"One chosen to share life's journey",story:"",storyId:""}],
-      60: [{id:"60-1-fortunate-man",name:"The Fortunate Man",transliteration:"Bhagya Vaan",gender:"Male",role:"Blessed",consistency:"Lucky one",details:"One blessed with a virtuous and worthy wife",story:"",storyId:""}],
-      61: [{id:"61-1-blessed-child",name:"The Blessed Child",transliteration:"Makkal",gender:"Gender-neutral",role:"Legacy",consistency:"Future",details:"Children are the greatest wealth of a family",story:"",storyId:""}],
-      62: [{id:"62-1-nurturing-mother",name:"The Nurturing Mother",transliteration:"Thaai",gender:"Female",role:"Nurturer",consistency:"First teacher",details:"One who shapes children's character",story:"",storyId:""}],
-      63: [{id:"63-1-guiding-father",name:"The Guiding Father",transliteration:"Thalaivan",gender:"Male",role:"Guide",consistency:"Protector",details:"One who guides children toward virtue",story:"",storyId:""}],
-      64: [{id:"64-1-obedient-child",name:"The Obedient Child",transliteration:"Kelikal Pillai",gender:"Gender-neutral",role:"Respectful",consistency:"Listener",details:"One who respects parents and learns their values",story:"",storyId:""}],
-      65: [{id:"65-1-virtuous-heir",name:"The Virtuous Heir",transliteration:"Thavi Pillai",gender:"Gender-neutral",role:"Successor",consistency:"Future carrier",details:"Child who carries forward family virtue",story:"",storyId:""}],
-      66: [{id:"66-1-proud-parents",name:"The Proud Parents",transliteration:"Ganaka Thazhaikal",gender:"Gender-neutral",role:"Proud ones",consistency:"Satisfied",details:"Parents whose children bring them pride",story:"",storyId:""}],
-      67: [{id:"67-1-educated-child",name:"The Educated Child",transliteration:"Kalvi Pillai",gender:"Gender-neutral",role:"Learner",consistency:"Scholar",details:"One trained in knowledge and virtue",story:"",storyId:""}],
-      68: [{id:"68-1-compassionate-heir",name:"The Compassionate Heir",transliteration:"Dayavaan Pillai",gender:"Gender-neutral",role:"Merciful",consistency:"Kind one",details:"Child who shows mercy and kindness",story:"",storyId:""}],
-      69: [{id:"69-1-faithful-child",name:"The Faithful Child",transliteration:"Nambikai Pillai",gender:"Gender-neutral",role:"Trustworthy",consistency:"Reliable",details:"One who is faithful to family values",story:"",storyId:""}],
-      70: [{id:"70-1-complete-family",name:"The Complete Family",transliteration:"Sampurna Kula",gender:"Gender-neutral",role:"Whole",consistency:"United",details:"A family complete in virtue and love",story:"",storyId:""}],
-      71: [{id:"71-1-devoted-lover",name:"The Devoted Lover",transliteration:"Anpudan",gender:"Gender-neutral",role:"Affectionate",consistency:"Compassionate",details:"One possessed of boundless love and compassion",story:"Love's First Meeting",storyId:"story-7"}],
-      72: [{id:"72-1-beloved",name:"The Cherished Beloved",transliteration:"Priyam",gender:"Gender-neutral",role:"Dear one",consistency:"Loved one",details:"One who is loved and cherished deeply",story:"Love's First Meeting",storyId:"story-7"}],
-      73: [{id:"73-1-caring-friend",name:"The Caring Friend",transliteration:"Sakha",gender:"Gender-neutral",role:"Friend",consistency:"Companion",details:"One who shows care and affection to others",story:"Love's First Meeting",storyId:"story-7"}],
-      74: [{id:"74-1-joyful-giver",name:"The Joyful Giver",transliteration:"Dana Priyaa",gender:"Gender-neutral",role:"Generous",consistency:"Delighted giver",details:"One who gives with joy and love",story:"Love's First Meeting",storyId:"story-7"}],
-      75: [{id:"75-1-heart-centered",name:"The Heart-Centered",transliteration:"Hridaya Kendra",gender:"Gender-neutral",role:"Loving",consistency:"Soul-focused",details:"One whose heart is center of love",story:"Love's First Meeting",storyId:"story-7"}],
-      76: [{id:"76-1-grateful-soul",name:"The Grateful Soul",transliteration:"Krutagna",gender:"Gender-neutral",role:"Thankful",consistency:"Appreciative",details:"One who expresses love through gratitude",story:"Love's First Meeting",storyId:"story-7"}],
-      77: [{id:"77-1-peaceful-presence",name:"The Peaceful Presence",transliteration:"Shanti Rupa",gender:"Gender-neutral",role:"Serene",consistency:"Calming",details:"One whose presence brings peace through love",story:"Love's First Meeting",storyId:"story-7"}],
-      78: [{id:"78-1-selfless-server",name:"The Selfless Server",transliteration:"Nishkama Seva",gender:"Gender-neutral",role:"Selfless",consistency:"Devotee",details:"One who serves others with no expectation",story:"Love's First Meeting",storyId:"story-7"}],
-      79: [{id:"79-1-truthful-friend",name:"The Truthful Friend",transliteration:"Satya Sakha",gender:"Gender-neutral",role:"Honest",consistency:"Sincere",details:"One whose love is expressed in truth",story:"Love's First Meeting",storyId:"story-7"}],
-      80: [{id:"80-1-universal-lover",name:"The Universal Lover",transliteration:"Sarva Priya",gender:"Gender-neutral",role:"All-loving",consistency:"Inclusive",details:"One who loves all beings equally",story:"Love's First Meeting",storyId:"story-7"}]
-    };
-
-    // Add template characters for kurals 81-1330
-    for (let i = 81; i <= 1330; i++) {
-      COMPREHENSIVE_CHARACTER_DATABASE[i] = [{
-        id: `${i}-1-character`,
-        name: `Character for Kural ${i}`,
-        transliteration: `Transliteration ${i}`,
-        gender: "Gender-neutral",
-        role: `Role in Kural ${i}`,
-        consistency: `Consistency for Kural ${i}`,
-        details: `Character description for Kural ${i}`,
-        story: "",
-        storyId: ""
-      }];
-    }
+    
 
     // DASHBOARD SIDEBAR MENU
     const ICONS = {
@@ -419,20 +333,28 @@
     function buildAllCharactersList() {
       const result = [];
 
-      for (const [kuralNum, characters] of Object.entries(COMPREHENSIVE_CHARACTER_DATABASE)) {
-        const kuralNumInt = parseInt(kuralNum);
-        if (Array.isArray(characters)) {
-          characters.forEach(char => {
-            result.push({
-              ...char,
-              kuralNumber: kuralNumInt,
-              kuralId: `TK-${String(kuralNumInt).padStart(4, '0')}`
-            });
+      for (let n = 1; n <= 1330; n++) {
+        if (typeof deriveKuralCharacters !== 'function') continue;
+        var chars = deriveKuralCharacters(n);
+        if (!chars || !chars.length) continue;
+        chars.forEach(function(c) {
+          result.push({
+            id: c.id || (n + '-1-' + c.name.toLowerCase().replace(/\s+/g, '-')),
+            name: c.name || 'Character for Kural ' + n,
+            transliteration: c.transliteration || '',
+            gender: c.gender || 'Gender-neutral',
+            role: c.role || '',
+            consistency: c.consistency || 'Story-derived',
+            details: c.description || '',
+            story: (c.storyContext && c.storyContext.title) || '',
+            storyId: '',
+            kuralNumber: n,
+            kuralId: 'TK-' + String(n).padStart(4, '0')
           });
-        }
+        });
       }
 
-      return result.sort((a, b) => a.kuralNumber - b.kuralNumber);
+      return result.sort(function(a, b) { return a.kuralNumber - b.kuralNumber; });
     }
 
     function renderCharacterRow(character) {

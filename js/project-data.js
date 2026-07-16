@@ -17,6 +17,7 @@ var PROJECT = null;
 
 function buildProjectData(optKuralNumber) {
   if (PROJECT && !optKuralNumber) return PROJECT;
+  if (PROJECT && optKuralNumber && PROJECT.kuralNumber === optKuralNumber) return PROJECT;
 
   var kn = optKuralNumber || 1;
   if (kn < 1 || kn > 1330) kn = 1;

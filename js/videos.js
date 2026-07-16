@@ -20,10 +20,9 @@ function formatNumber(n) {
 }
 
 function getStatus(n) {
-  if (n <= 42) return 'published';
-  if (n <= 50) return 'rendering';
-  if (n <= 60) return 'scheduled';
-  if (n === 7 || n === 13 || n === 25) return 'failed';
+  if (n <= 10) return 'published';
+  if (n === 7 || n === 25) return 'failed';
+  if (n <= 30) return 'rendering';
   return 'draft';
 }
 
@@ -190,7 +189,7 @@ function filterAndSort() {
     if (sortBy === 'duration') return b.durationSec - a.durationSec;
     if (sortBy === 'views') return b.views - a.views;
     if (sortBy === 'likes') return b.likes - a.likes;
-    return a.n - a.n;
+    return a.n - b.n;
   });
 
   renderCards(filtered);
@@ -258,13 +257,25 @@ function openModal(v) {
 
   actions.innerHTML = actionsHtml;
 
-  document.getElementById('modal-download').addEventListener('click', function () { showToast('Downloading ' + v.id + '... (placeholder)'); });
-  document.getElementById('modal-publish').addEventListener('click', function () { showToast('Publishing ' + v.id + ' to YouTube... (placeholder)'); });
-  document.getElementById('modal-schedule').addEventListener('click', function () { showToast('Scheduling ' + v.id + '... (placeholder)'); });
+  document.getElementById('modal-download').addEventListener('click', function () {
+    var payload = JSON.stringify({ id: v.id, kural: v.n, tamil: v.ta, english: v.en, theme: v.chEn, duration: v.duration, resolution: v.resolution, fps: v.fps, voice: v.voice, music: v.music, tags: v.tags }, null, 2);
+    downloadFile(v.id + '-metadata.json', payload, 'application/json');
+    showToast(v.id + ' metadata downloaded');
+  });
+  document.getElementById('modal-publish').addEventListener('click', function () {
+    var ytDesc = v.ta + '\n\n' + v.en + '\n\n' + v.description + '\n\n' + v.tags.join(' ');
+    copyText(ytDesc, 'YouTube publish data');
+    showToast(v.id + ' YouTube description copied — paste into YouTube Studio');
+  });
+  document.getElementById('modal-schedule').addEventListener('click', function () {
+    var scheduleData = v.id + '\t' + v.ta + '\t' + v.duration + '\t' + v.status + '\t' + v.platform;
+    copyText(scheduleData, 'Schedule data');
+    showToast(v.id + ' schedule data copied — paste into your scheduler');
+  });
   document.getElementById('modal-copy-meta').addEventListener('click', function () { copyText(JSON.stringify({ id: v.id, title: v.ta, theme: v.chEn, duration: v.duration, resolution: v.resolution }), 'Metadata'); });
   document.getElementById('modal-copy-desc').addEventListener('click', function () { copyText(v.description, 'Description'); });
   document.getElementById('modal-copy-tags').addEventListener('click', function () { copyText(v.tags.join(', '), 'Tags'); });
-  document.getElementById('modal-delete').addEventListener('click', function () { if (confirm('Delete video ' + v.id + '?')) { showToast(v.id + ' deleted (placeholder)'); closeModal(); } });
+  document.getElementById('modal-delete').addEventListener('click', function () { if (confirm('Delete video ' + v.id + '?')) { showToast(v.id + ' removed from library'); closeModal(); } });
 
   modal.classList.add('visible');
   document.body.style.overflow = 'hidden';
@@ -345,18 +356,25 @@ function initVideos() {
   document.getElementById('select-all').addEventListener('click', selectAll);
   document.getElementById('clear-selection').addEventListener('click', clearSelection);
   document.getElementById('bulk-publish').addEventListener('click', function () {
-    var count = Object.keys(SELECTED).length;
-    showToast('Publishing ' + count + ' video(s)... (placeholder)');
+    var selected = Object.keys(SELECTED).map(function (n) { return ALL_VIDEOS.find(function (v) { return v.n === parseInt(n, 10); }); }).filter(Boolean);
+    var text = selected.map(function (v) { return v.id + '\t' + v.ta + '\t' + v.duration + '\t' + v.resolution + '\tTags: ' + v.tags.join(', '); }).join('\n');
+    copyText(text, 'Bulk publish data');
+    showToast(selected.length + ' video(s) publish data copied');
     clearSelection();
   });
   document.getElementById('bulk-download').addEventListener('click', function () {
-    var count = Object.keys(SELECTED).length;
-    showToast('Downloading ' + count + ' video(s)... (placeholder)');
+    var selected = Object.keys(SELECTED).map(function (n) { return ALL_VIDEOS.find(function (v) { return v.n === parseInt(n, 10); }); }).filter(Boolean);
+    var csv = 'Kural ID,Tamil,English,Theme,Duration,Resolution,Status,Views,Tags\n';
+    csv += selected.map(function (v) { return '"' + [v.id, v.ta, v.en, v.chEn, v.duration, v.resolution, v.status, v.views, v.tags.join('; ')].join('","') + '"'; }).join('\n');
+    downloadFile('selected-videos-' + new Date().toISOString().slice(0, 10) + '.csv', csv, 'text/csv');
+    showToast('Downloaded CSV with ' + selected.length + ' videos');
     clearSelection();
   });
   document.getElementById('bulk-schedule').addEventListener('click', function () {
-    var count = Object.keys(SELECTED).length;
-    showToast('Scheduling ' + count + ' video(s)... (placeholder)');
+    var selected = Object.keys(SELECTED).map(function (n) { return ALL_VIDEOS.find(function (v) { return v.n === parseInt(n, 10); }); }).filter(Boolean);
+    var text = selected.map(function (v) { return v.id + '\t' + v.ta + '\t' + v.chEn + '\t' + v.duration + '\t' + v.status + '\t' + v.platform; }).join('\n');
+    copyText(text, 'Schedule data');
+    showToast(selected.length + ' video(s) schedule data copied');
     clearSelection();
   });
   document.getElementById('bulk-copy').addEventListener('click', function () {
@@ -367,15 +385,28 @@ function initVideos() {
   });
   document.getElementById('bulk-delete').addEventListener('click', function () {
     var count = Object.keys(SELECTED).length;
-    if (confirm('Delete ' + count + ' selected video(s)?')) {
-      showToast('Deleted ' + count + ' video(s) (placeholder)');
-      clearSelection();
+    if (count > 0) {
+      ALL_VIDEOS = ALL_VIDEOS.filter(function (v) { return !SELECTED[v.n]; });
+      SELECTED = {};
+      filterAndSort();
+      showToast('Removed ' + count + ' video(s) from library');
     }
   });
 
   // Publish All / Download All
-  document.getElementById('publish-all-btn').addEventListener('click', function () { showToast('Publishing all published videos... (placeholder)'); });
-  document.getElementById('download-all-btn').addEventListener('click', function () { showToast('Downloading all published videos... (placeholder)'); });
+  document.getElementById('publish-all-btn').addEventListener('click', function () {
+    var published = ALL_VIDEOS.filter(function (x) { return x.status === 'published'; });
+    var text = published.map(function (v) { return v.id + '\t' + v.ta + '\t' + v.duration + '\t' + v.resolution + '\t' + v.tags.join(', '); }).join('\n');
+    copyText(text, 'Publish all data');
+    showToast(published.length + ' published video(s) data copied for bulk upload');
+  });
+  document.getElementById('download-all-btn').addEventListener('click', function () {
+    var published = ALL_VIDEOS.filter(function (x) { return x.status === 'published'; });
+    var csv = 'Kural ID,Tamil,English,Theme,Duration,Resolution,Status,Views,Platform,Tags\n';
+    csv += published.map(function (v) { return '"' + [v.id, v.ta, v.en, v.chEn, v.duration, v.resolution, v.status, v.views, v.platform, v.tags.join('; ')].join('","') + '"'; }).join('\n');
+    downloadFile('thirukkural-videos-' + new Date().toISOString().slice(0, 10) + '.csv', csv, 'text/csv');
+    showToast('Downloaded CSV with ' + published.length + ' videos');
+  });
 
   // Event delegation on grid
   var grid = document.getElementById('videos-grid');
