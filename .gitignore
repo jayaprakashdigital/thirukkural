@@ -24,3 +24,5 @@ dist/
 build/
 coverage/
 .cache/
+
+.infra-local.json
