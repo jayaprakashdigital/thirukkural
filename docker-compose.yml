@@ -23,6 +23,7 @@ services:
     depends_on:
       - webhook
       - studio
+      - image-api
     restart: unless-stopped
 
   webhook:
@@ -64,7 +65,22 @@ services:
       - ./:/repo:ro
       # Named volume so the generation-state index survives `git reset --hard` deploys and rebuilds.
       - studio-state:/data
+      - image-api
     restart: unless-stopped
 
+
+  image-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thirukkural-image-api
+    command: ["node", "image-server.js"]
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PORT=3701
+      - REPO_PATH=/repo
+    volumes:
+      - ./:/repo
+    restart: unless-stopped
 volumes:
   studio-state:

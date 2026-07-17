@@ -98,7 +98,6 @@ function populateFilters() {
 
 /* ===== CARD RENDERING ===== */
 function renderCard(c) {
-  var initials = (c.name || "?").charAt(0).toUpperCase();
   var locked = c.lockFace || c.lockHair || c.lockCostume;
   var statusClass = c.status === "Archived" ? " archived" : (locked ? " locked" : "");
   var tags = [];
@@ -108,15 +107,15 @@ function renderCard(c) {
   if (locked) tags.push('<span class="char-tag teal">Locked</span>');
   if (c.storiesUsed && c.storiesUsed.length) tags.push('<span class="char-tag blue">' + c.storiesUsed.length + ' stories</span>');
 
-  // Story-derived character ids look like "TK-0001-c0" — the trailing
-  // index is which character in that kural's cast this is, used to deep
-  // link straight to that character on character-detail.html.
   var idxMatch = /-c(\d+)$/.exec(c.id || "");
   var profileLink = (!c.legacy && c.kuralNumber) ?
     '<a class="char-card-profile-link" data-no-drawer href="character-detail.html?kural=' + c.kuralNumber + '&c=' + (idxMatch ? idxMatch[1] : 0) + '">Open full profile &rarr;</a>' : "";
 
+  var imgHtml = (typeof renderCardImage === "function") ? renderCardImage(c) : '<div class="char-card-image char-card-image-empty"><div class="char-card-placeholder">' + (c.name || "?").charAt(0).toUpperCase() + '</div></div>';
+
   return '<div class="char-card' + statusClass + '" data-char-id="' + esc(c.id) + '">' +
-    '<div class="char-card-top"><div class="char-avatar">' + initials + '</div><div class="char-card-info">' +
+    imgHtml +
+    '<div class="char-card-top"><div class="char-card-info">' +
     '<h3 class="char-card-name">' + esc(c.name) + '</h3><span class="char-card-id">' + esc(c.id) + '</span></div></div>' +
     '<div class="char-card-body"><div class="char-card-tags">' + tags.join("") + '</div></div>' +
     '<div class="char-card-footer"><span>Updated: ' + (c.modifiedAt ? c.modifiedAt.slice(0, 10) : '—') + '</span>' +
@@ -175,6 +174,7 @@ function filterChars(resetPage) {
   if (charPage > totalPages) charPage = totalPages;
   var pageItems = filtered.slice((charPage - 1) * CHAR_PAGE_SIZE, charPage * CHAR_PAGE_SIZE);
   renderGrid(pageItems);
+  if (typeof wireCardGenButtons === 'function') wireCardGenButtons();
   renderPager(filtered.length, totalPages);
 }
 
@@ -190,6 +190,7 @@ var CHAR_TABS = [
   { id: "image-lock", label: "Image Lock" },
   { id: "video-lock", label: "Video Lock" },
   { id: "voice-lock", label: "Voice Lock" },
+  { id: "image-gen", label: "Image" },
   { id: "usage", label: "Usage" },
   { id: "relationships", label: "Relationships" },
   { id: "history", label: "History" }
@@ -533,6 +534,7 @@ function initCharacterLibrary() {
   renderStats();
   populateFilters();
   filterChars();
+  if (typeof preloadImages === 'function') preloadImages(charCache);
 
   // Deep link from character-detail.html's "Edit in Character Library" button.
   var openId = new URLSearchParams(window.location.search).get("open");
