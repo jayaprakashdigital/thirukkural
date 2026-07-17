@@ -181,6 +181,75 @@ function filterLibrary() {
   }
 }
 
+function showImageDetailsModal(item) {
+  var existing = document.getElementById('image-detail-modal');
+  if (existing) existing.remove();
+  var num = item.n;
+  var id = item.id || ('TK-' + String(num).padStart(4, '0'));
+  var title = item.t || item.chTa || '';
+  var chapterEn = item.chEn || '';
+  var status = (item.status || 'not_started').replace(/_/g, ' ');
+  var media = (typeof KURAL_MEDIA !== 'undefined') ? KURAL_MEDIA.find(function(m) { return m.n === num; }) : null;
+  var overlay = document.createElement('div');
+  overlay.id = 'image-detail-modal';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:24px;';
+  var studioAvail = (typeof kuralStudioAvailable === 'function') ? kuralStudioAvailable(num) : false;
+  var d = document.createElement.bind(document);
+  var card = d('div');
+  card.style.cssText = 'background:#111827;border:1px solid #374151;border-radius:16px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto;padding:28px;position:relative;';
+  var closeBtn = d('button');
+  closeBtn.textContent = '\u2715';
+  closeBtn.style.cssText = 'position:absolute;top:12px;right:12px;background:none;border:none;color:#9ca3af;cursor:pointer;font-size:20px;';
+  closeBtn.onclick = function() { overlay.remove(); };
+  var idEl = d('div');
+  idEl.textContent = id;
+  idEl.style.cssText = 'font-size:12px;color:#9ca3af;margin-bottom:4px;';
+  var titleEl = d('h2');
+  titleEl.textContent = title;
+  titleEl.style.cssText = 'margin:0 0 4px;font-size:20px;color:#f3f4f6;';
+  var chEl = d('div');
+  chEl.textContent = chapterEn;
+  chEl.style.cssText = 'font-size:13px;color:#9ca3af;margin-bottom:16px;';
+  var grid = d('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;';
+  var s1 = d('div'); s1.style.cssText = 'background:#1f2937;border-radius:8px;padding:12px;';
+  var s1l = d('div'); s1l.textContent = 'Status'; s1l.style.cssText = 'font-size:11px;color:#9ca3af;text-transform:uppercase;';
+  var s1v = d('div'); s1v.textContent = status; s1v.style.cssText = 'font-size:14px;color:#f3f4f6;text-transform:capitalize;';
+  s1.appendChild(s1l); s1.appendChild(s1v);
+  var s2 = d('div'); s2.style.cssText = 'background:#1f2937;border-radius:8px;padding:12px;';
+  var s2l = d('div'); s2l.textContent = 'Kural #'; s2l.style.cssText = 'font-size:11px;color:#9ca3af;text-transform:uppercase;';
+  var s2v = d('div'); s2v.textContent = String(num); s2v.style.cssText = 'font-size:14px;color:#f3f4f6;';
+  s2.appendChild(s2l); s2.appendChild(s2v);
+  grid.appendChild(s1); grid.appendChild(s2);
+  card.appendChild(closeBtn); card.appendChild(idEl); card.appendChild(titleEl); card.appendChild(chEl); card.appendChild(grid);
+  if (media && media.en) {
+    var me = d('div'); me.style.cssText = 'background:#1f2937;border-radius:8px;padding:12px;margin-bottom:16px;';
+    var mel = d('div'); mel.textContent = 'Meaning (English)'; mel.style.cssText = 'font-size:12px;color:#9ca3af;margin-bottom:6px;';
+    var mev = d('div'); mev.textContent = media.en; mev.style.cssText = 'font-size:13px;color:#f3f4f6;line-height:1.5;';
+    me.appendChild(mel); me.appendChild(mev); card.appendChild(me);
+  }
+  var btnRow = d('div'); btnRow.style.cssText = 'display:flex;gap:8px;';
+  if (studioAvail) {
+    var link = d('a');
+    link.href = 'kural-detail.html?id=' + id;
+    link.textContent = 'Open in Kural Studio';
+    link.style.cssText = 'flex:1;text-align:center;padding:10px 16px;background:#6366f1;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;';
+    btnRow.appendChild(link);
+  } else {
+    var na = d('span'); na.textContent = 'Studio not available';
+    na.style.cssText = 'flex:1;text-align:center;padding:10px 16px;background:#1f2937;color:#9ca3af;border-radius:8px;font-weight:600;';
+    btnRow.appendChild(na);
+  }
+  var copyBtn = d('button'); copyBtn.textContent = 'Copy ID';
+  copyBtn.style.cssText = 'padding:10px 16px;background:#1f2937;color:#f3f4f6;border:1px solid #374151;border-radius:8px;cursor:pointer;';
+  copyBtn.onclick = function() { navigator.clipboard.writeText(id); if(typeof showToast==='function') showToast('Copied ' + id); };
+  btnRow.appendChild(copyBtn);
+  card.appendChild(btnRow);
+  overlay.appendChild(card);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
 function initLibrary() {
   if (typeof KURAL_MEDIA === "undefined") {
     const grid = document.getElementById(getLibraryType() === "images" ? "images-grid" : "videos-grid");
@@ -202,7 +271,9 @@ function initLibrary() {
     if (!card) return;
     const item = ALL_ITEMS.find((i) => i.n === parseInt(card.dataset.n, 10));
     if (!item) return;
-    if (kuralStudioAvailable(item.n)) {
+    if (getLibraryType() === "images") {
+      showImageDetailsModal(item);
+    } else if (kuralStudioAvailable(item.n)) {
       openKuralStudio(item.n);
     } else {
       showToast(item.id + " — " + item.chEn + " (" + item.status + ") — Kural Studio not available for this kural yet");
