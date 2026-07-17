@@ -496,19 +496,163 @@ function initialsOf(name) {
 function buildAvatarSVG(name, seed, face) {
   var hue = seed % 360;
   var hue2 = (hue + 45) % 360;
+  var hue3 = (hue + 120) % 360;
   var uid = "cdg" + seed + "_" + face;
-  var skewX = face === "side" ? 18 : (face === "back" ? -6 : 0);
-  var label = face === "back" ? "" : (typeof esc === "function" ? esc(initialsOf(name)) : initialsOf(name));
-  return '<svg viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + face + ' view placeholder">' +
-    '<defs><linearGradient id="' + uid + '" x1="0" y1="0" x2="1" y2="1">' +
-    '<stop offset="0%" stop-color="hsl(' + hue + ',55%,32%)"/>' +
-    '<stop offset="100%" stop-color="hsl(' + hue2 + ',60%,16%)"/>' +
-    '</linearGradient></defs>' +
-    '<rect width="240" height="320" fill="url(#' + uid + ')"/>' +
-    '<g transform="skewX(' + skewX + ')" transform-origin="120 320">' +
-    '<circle cx="120" cy="112" r="50" fill="rgba(255,255,255,0.14)"/>' +
-    '<path d="M42 320 Q42 208 120 198 Q198 208 198 320 Z" fill="rgba(255,255,255,0.14)"/>' +
-    '</g>' +
-    (label ? '<text x="120" y="126" font-family="DM Sans, sans-serif" font-size="40" font-weight="700" fill="rgba(255,255,255,0.85)" text-anchor="middle" dominant-baseline="middle">' + label + '</text>' : '') +
-    '</svg>';
+
+  // Determine character type from seed
+  var isFemale = (seed % 3 === 0);
+  var isElder = (seed % 5 === 0);
+  var isSage = (seed % 7 === 0);
+
+  var skewX = face === "side" ? 15 : (face === "back" ? -5 : 0);
+  var showFace = face !== "back";
+  var label = showFace ? (typeof esc === "function" ? esc(initialsOf(name)) : initialsOf(name)) : "";
+
+  // Skin tones
+  var skinBase = isSage ? [210, 170, 100] : (isFemale ? [180, 130, 80] : [160, 110, 70]);
+  var skinLight = [skinBase[0]+30, skinBase[1]+20, skinBase[2]+15];
+  var skinShadow = [skinBase[0]-30, skinBase[1]-20, skinBase[2]-15];
+
+  // Hair
+  var hairColor = isSage ? [220, 220, 210] : [30, 25, 20];
+
+  // Clothing colors
+  var clothHue = isSage ? 30 : (isFemale ? 350 : 220);
+  var clothMain = "hsl(" + clothHue + ",60%,35%)";
+  var clothLight = "hsl(" + clothHue + ",50%,45%)";
+  var clothBorder = "hsl(" + clothHue + ",40%,25%)";
+
+  // Gold accent
+  var goldColor = "hsl(45,70%,55%)";
+
+  var svg = '<svg viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="' + name + ' ' + face + ' view">';
+
+  // Background gradient
+  svg += '<defs>';
+  svg += '<linearGradient id="' + uid + '-bg" x1="0" y1="0" x2="1" y2="1">';
+  svg += '<stop offset="0%" stop-color="hsl(' + hue + ',40%,18%)"/>';
+  svg += '<stop offset="100%" stop-color="hsl(' + hue2 + ',35%,10%)"/>';
+  svg += '</linearGradient>';
+  svg += '<radialGradient id="' + uid + '-glow" cx="50%" cy="30%" r="60%">';
+  svg += '<stop offset="0%" stop-color="hsla(' + hue + ',50%,40%,0.3)"/>';
+  svg += '<stop offset="100%" stop-color="hsla(' + hue + ',50%,40%,0)"/>';
+  svg += '</radialGradient>';
+  svg += '<linearGradient id="' + uid + '-skin" x1="0" y1="0" x2="0" y2="1">';
+  svg += '<stop offset="0%" stop-color="rgb(' + skinLight.join(',') + ')"/>';
+  svg += '<stop offset="100%" stop-color="rgb(' + skinBase.join(',') + ')"/>';
+  svg += '</linearGradient>';
+  svg += '</defs>';
+
+  // Background
+  svg += '<rect width="240" height="320" fill="url(#' + uid + '-bg)"/>';
+  svg += '<rect width="240" height="320" fill="url(#' + uid + '-glow)"/>';
+
+  // Main group with skew
+  svg += '<g transform="skewX(' + skewX + ')" transform-origin="120 280">';
+
+  // Body / Clothing
+  if (face === "back") {
+    // Back view - simple robe shape
+    svg += '<path d="M50 320 L50 195 Q50 175 80 170 L160 170 Q190 175 190 195 L190 320 Z" fill="' + clothMain + '"/>';
+    svg += '<path d="M80 170 Q120 160 160 170" fill="none" stroke="' + clothBorder + '" stroke-width="1.5"/>';
+    // Hair back
+    if (isSage || isFemale) {
+      svg += '<path d="M90 110 Q90 80 120 75 Q150 80 150 110 L150 160 Q140 170 120 175 Q100 170 90 160 Z" fill="rgb(' + hairColor.join(',') + ')"/>';
+    }
+  } else {
+    // Front/Side - neck and shoulders
+    svg += '<path d="M85 170 L85 195 Q85 200 80 210 L50 320 L190 320 L160 210 Q155 200 155 195 L155 170" fill="' + clothMain + '"/>';
+
+    // Gold border on costume
+    svg += '<line x1="120" y1="170" x2="120" y2="320" stroke="' + goldColor + '" stroke-width="1.5" opacity="0.6"/>';
+    svg += '<path d="M85 170 Q120 163 155 170" fill="none" stroke="' + goldColor + '" stroke-width="1.5" opacity="0.6"/>';
+
+    // Sacred thread (for males)
+    if (!isFemale && !isSage) {
+      svg += '<line x1="110" y1="175" x2="80" y2="280" stroke="' + goldColor + '" stroke-width="0.8" opacity="0.4"/>';
+    }
+
+    // Neck
+    svg += '<rect x="108" y="155" width="24" height="20" rx="4" fill="url(#' + uid + '-skin)"/>';
+
+    // Head
+    var headY = 85;
+    var headR = 42;
+    svg += '<circle cx="120" cy="' + headY + '" r="' + headR + '" fill="url(#' + uid + '-skin)"/>';
+
+    // Ears
+    svg += '<ellipse cx="78" cy="' + headY + '" rx="6" ry="8" fill="rgb(' + skinBase.join(',') + ')"/>';
+    svg += '<ellipse cx="162" cy="' + headY + '" rx="6" ry="8" fill="rgb(' + skinBase.join(',') + ')"/>';
+
+    // Hair
+    if (isSage) {
+      // Sage - flowing hair and beard
+      svg += '<path d="M78 75 Q78 40 120 35 Q162 40 162 75 L165 110 Q155 105 150 100 L90 100 Q85 105 75 110 Z" fill="rgb(' + hairColor.join(',') + ')"/>';
+      // Topknot
+      svg += '<ellipse cx="120" cy="35" rx="18" ry="12" fill="rgb(' + hairColor.join(',') + ')"/>';
+      // Beard
+      if (face === "front") {
+        svg += '<path d="M95 105 Q95 140 120 150 Q145 140 145 105" fill="rgb(' + hairColor.join(',') + ')" opacity="0.9"/>';
+      }
+    } else if (isFemale) {
+      // Female - long hair
+      svg += '<path d="M78 75 Q78 40 120 35 Q162 40 162 75 L165 120 Q155 125 145 128 Q130 135 120 138 Q110 135 95 128 Q85 125 75 120 Z" fill="rgb(' + hairColor.join(',') + ')"/>';
+      // Side hair
+      svg += '<path d="M78 90 Q65 120 62 170 Q60 190 65 200" fill="none" stroke="rgb(' + hairColor.join(',') + ')" stroke-width="12" stroke-linecap="round" opacity="0.7"/>';
+      svg += '<path d="M162 90 Q175 120 178 170 Q180 190 175 200" fill="none" stroke="rgb(' + hairColor.join(',') + ')" stroke-width="12" stroke-linecap="round" opacity="0.7"/>';
+      // Bindi
+      svg += '<circle cx="120" cy="78" r="3" fill="#cc3333"/>';
+      // Jhumka earrings
+      svg += '<circle cx="78" cy="100" r="4" fill="' + goldColor + '"/>';
+      svg += '<circle cx="162" cy="100" r="4" fill="' + goldColor + '"/>';
+      svg += '<path d="M78 104 L78 112 L74 112 L78 112 L82 112 Z" fill="' + goldColor + '"/>';
+      svg += '<path d="M162 104 L162 112 L158 112 L162 112 L166 112 Z" fill="' + goldColor + '"/>';
+    } else {
+      // Male - short hair
+      svg += '<path d="M78 75 Q78 40 120 35 Q162 40 162 75 L158 95 Q145 90 130 88 Q110 88 100 90 L82 95 Z" fill="rgb(' + hairColor.join(',') + ')"/>';
+      // Beard
+      if (face === "front") {
+        svg += '<path d="M98 110 Q100 130 120 138 Q140 130 142 110" fill="rgb(' + skinShadow.join(',') + ')" opacity="0.5"/>';
+      }
+      // Vibhuti
+      svg += '<line x1="112" y1="78" x2="128" y2="78" stroke="white" stroke-width="2" opacity="0.7"/>';
+    }
+
+    // Face features (only for front/side)
+    if (face === "front" || face === "side") {
+      var eyeOffX = face === "side" ? -8 : 0;
+
+      // Eyes
+      svg += '<ellipse cx="' + (104 + eyeOffX) + '" cy="90" rx="8" ry="5" fill="white"/>';
+      svg += '<ellipse cx="' + (136 + eyeOffX) + '" cy="90" rx="8" ry="5" fill="white"/>';
+      svg += '<circle cx="' + (105 + eyeOffX) + '" cy="90" r="3.5" fill="#2a1a0a"/>';
+      svg += '<circle cx="' + (137 + eyeOffX) + '" cy="90" r="3.5" fill="#2a1a0a"/>';
+      svg += '<circle cx="' + (106 + eyeOffX) + '" cy="89" r="1" fill="white"/>';
+      svg += '<circle cx="' + (138 + eyeOffX) + '" cy="89" r="1" fill="white"/>';
+
+      // Eyebrows
+      svg += '<path d="M92 ' + (85) + ' Q104 ' + (82) + ' 112 ' + (84) + '" fill="none" stroke="rgb(' + hairColor.join(',') + ')" stroke-width="2"/>';
+      svg += '<path d="M128 ' + (84) + ' Q136 ' + (82) + ' 148 ' + (85) + '" fill="none" stroke="rgb(' + hairColor.join(',') + ')" stroke-width="2"/>';
+
+      // Nose
+      svg += '<path d="M120 92 L118 105 Q120 108 122 105 Z" fill="rgb(' + skinShadow.join(',') + ')" opacity="0.3"/>';
+
+      // Mouth
+      if (face === "front") {
+        svg += '<path d="M110 118 Q120 124 130 118" fill="none" stroke="#994444" stroke-width="2" stroke-linecap="round"/>';
+      } else {
+        svg += '<path d="M112 118 Q120 122 128 118" fill="none" stroke="#994444" stroke-width="1.5" stroke-linecap="round"/>';
+      }
+    }
+  }
+
+  svg += '</g>';
+
+  // Name label
+  if (label) {
+    svg += '<text x="120" y="308" font-family="DM Sans, sans-serif" font-size="14" font-weight="600" fill="rgba(255,255,255,0.8)" text-anchor="middle">' + label + '</text>';
+  }
+
+  svg += '</svg>';
+  return svg;
 }
